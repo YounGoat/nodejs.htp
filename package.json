@@ -1,0 +1,35 @@
+{
+    "name": "htp",
+    "version": "0.0.1",
+    "description": "Easy http/https client",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "mocha --timeout 30000"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/YounGoat/nodejs.badging.git"
+    },
+    "keywords": [
+        "badge",
+        "npm",
+        "travis",
+        "license"
+    ],
+    "author": "youngoat@163.com",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/YounGoat/nodejs.badging/issues"
+    },
+    "homepage": "https://github.com/YounGoat/nodejs.badging#readme",
+    "devDependencies": {
+        "ajv": "^5.1.5",
+        "mocha": "^3.4.1"
+    },
+    "dependencies": {
+        "overload2": "^0.1.0"
+    }
+}

@@ -1,0 +1,32 @@
+{
+	"title": "htp response",
+	"type": "object",
+	"properties": {
+		"statusCode": {
+			"type": "number"
+		},
+		"statusMessage": {
+			"type": "string"
+		},
+		"httpVersion": {
+			"type": "string"
+		},
+		"headers": {
+			"type": "object"
+		},
+		"body": {
+			"type": "string"
+		},
+		"bodyDecompressed": {
+			"type": "boolean"
+		},
+		"bodyBuffer": {
+			"type": "object"
+		},
+		"performance": {
+			"type": "object"
+		}
+	},
+	"required": ["statusCode", "headers"],
+	"additionalProperties": false
+}

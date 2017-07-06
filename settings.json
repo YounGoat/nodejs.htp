@@ -1,0 +1,9 @@
+{
+	"request_timeout": 30000,
+	"dns_timeout": 1000,
+	"plugin_timeout": 100,
+	"connect_timeout": 4000,
+	"response_timeout": 15000,
+	"chunk_timeout": 2000,
+	"data_timeout": 25000
+}
