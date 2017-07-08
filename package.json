@@ -1,6 +1,6 @@
 {
     "name": "htp",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Easy http/https client",
     "main": "index.js",
     "directories": {
@@ -11,25 +11,23 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/YounGoat/nodejs.badging.git"
+        "url": "git+https://github.com/YounGoat/nodejs.htp.git"
     },
     "keywords": [
-        "badge",
-        "npm",
-        "travis",
-        "license"
+        "http",
+        "https"
     ],
     "author": "youngoat@163.com",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/YounGoat/nodejs.badging/issues"
+        "url": "https://github.com/YounGoat/nodejs.htp/issues"
     },
-    "homepage": "https://github.com/YounGoat/nodejs.badging#readme",
+    "homepage": "https://github.com/YounGoat/nodejs.htp#readme",
     "devDependencies": {
         "ajv": "^5.1.5",
         "mocha": "^3.4.1"
     },
     "dependencies": {
-        "overload2": "^0.1.0"
+        "overload2": "^0.2.0"
     }
 }

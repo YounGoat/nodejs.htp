@@ -218,7 +218,9 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				remotePort: null
 			};
 
-			let clientRequest = http.request(options, (response) => processResponse(timeout, response, fnDone));
+
+			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
+				.request(options, (response) => processResponse(timeout, response, fnDone));
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
