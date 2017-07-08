@@ -1,21 +1,14 @@
 #	htp
 __Maybe the easiest but still strong http client you have ever meet.__
 
+[![total downloads of htp](https://img.shields.io/npm/dt/htp.svg)](https://www.npmjs.com/package/htp)
+[![htp's License](https://img.shields.io/npm/l/htp.svg)](https://www.npmjs.com/package/htp)
+[![latest version of htp](https://img.shields.io/npm/v/htp.svg)](https://www.npmjs.com/package/htp)
 [![coverage status of github.com/YounGoat/nodejs.htp](https://img.shields.io/coveralls/YounGoat/nodejs.htp/master.svg)](https://coveralls.io/github/YounGoat/nodejs.htp2?branch=master)
 [![dependencies of github.com/YounGoat/nodejs.htp](https://david-dm.org/YounGoat/nodejs.htp/status.svg)](https://david-dm.org/YounGoat/nodejs.htp)
 [![devDependencies of github.com/YounGoat/nodejs.htp](https://david-dm.org/YounGoat/nodejs.htp/dev-status.svg)](https://david-dm.org/YounGoat/nodejs.htp?type=dev)
 [![build status of github.com/YounGoat/nodejs.htp](https://travis-ci.org/YounGoat/nodejs.htp.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.htp)
 [![star github.com/YounGoat/nodejs.htp](https://img.shields.io/github/stars/YounGoat/nodejs.htp.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.htp/stargazers)
-
-[![total downloads of htp](https://img.shields.io/npm/dt/htp.svg)](https://www.npmjs.com/package/htp)
-[![htp's License](https://img.shields.io/npm/l/htp.svg)](https://www.npmjs.com/package/htp)
-[![latest version of htp](https://img.shields.io/npm/v/htp.svg)](https://www.npmjs.com/package/htp)
-[![coverage status of github.com/YounGoat/nodejs.badging](https://img.shields.io/coveralls/YounGoat/nodejs.badging/master.svg)](https://coveralls.io/github/YounGoat/nodejs.badging2?branch=master)
-[![dependencies of github.com/YounGoat/nodejs.badging](https://david-dm.org/YounGoat/nodejs.badging/status.svg)](https://david-dm.org/YounGoat/nodejs.badging)
-[![devDependencies of github.com/YounGoat/nodejs.badging](https://david-dm.org/YounGoat/nodejs.badging/dev-status.svg)](https://david-dm.org/YounGoat/nodejs.badging?type=dev)
-[![build status of github.com/YounGoat/nodejs.badging](https://travis-ci.org/YounGoat/nodejs.badging.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.badging)
-[![star github.com/YounGoat/nodejs.badging](https://img.shields.io/github/stars/YounGoat/nodejs.badging.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.badging/stargazers)
-
 
 ##	Links
 
