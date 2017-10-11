@@ -54,3 +54,15 @@ client.request('GET', 'http://www.example.com/', function(err, response) {
 	// ...
 });
 ```
+
+##	API
+
+```javascript
+htp(
+	/*string*/ REQUSET_METHOD_NAME,
+	/*string*/ URL,
+	/*OPTIONAL object*/ HEADERS,
+	/*OPTIONAL string | object | stream.Readable*/ DATA,
+	/*OPTIONAL function*/ CALLBACK
+);
+```

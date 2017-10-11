@@ -7,7 +7,7 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 
 	/* in-package */
-	, htp = require('../../index')
+	, htp = require('../../htp')
 	;
 
 module.exports = function(req, res) {

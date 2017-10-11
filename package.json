@@ -1,8 +1,8 @@
 {
     "name": "htp",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Easy http/https client",
-    "main": "index.js",
+    "main": "htp.js",
     "directories": {
         "test": "test"
     },

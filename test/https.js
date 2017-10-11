@@ -9,7 +9,7 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 	, ajv = require('ajv')
 	/* in-package */
-	, htp = require('../index')
+	, htp = require('../htp')
 	, schema = require('../response.schema')
 	, ERRORS = require('../ERRORS')
 	;

@@ -8,6 +8,7 @@ const MODULE_REQUIRE = 1
 	, https = require('https')
 	, stream = require('stream')
 	, url = require('url')
+	, util = require('util')
 	, zlib = require('zlib')
 
 	/* NPM */
@@ -43,9 +44,9 @@ const HTTP_METHOD_PAYLOAD = Type.and(HTTP_METHOD, Type.not(HTTP_METHOD_NO_PAYLOA
 
 const URL = 'string';
 
-const HEADERS = 'object';
+const HEADERS = ['object', 'NULL'];
 
-const BODY = Type.or('string', 'object', Buffer, stream.Readable);
+const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL'];
 
 const CALLBACK = Function;
 
@@ -162,19 +163,49 @@ const parseBody = function(buf, content) {
 const baseRequest = function(method, urlname, headers, body, callback) {
 	let settings = (this instanceof easyRequest) ? this.settings : defaultSettings;
 
-	return new Promise((resolve, reject) => {
+	if (!headers) {
+		headers = {};
+	}
+
+	// Each header field consists of a name followed by a colon (":") and the field value. Field names are case-insensitive.
+	// @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+	if (1) {
+		let normalizedHeaders = {};
+		for (let name in headers) {
+			normalizedHeaders[name.toLowerCase()] = headers[name];
+		}
+		headers = normalizedHeaders;
+	}
+
+	if (util.isUndefined(headers['accept-encoding'])) {
+		headers['accept-encoding'] = 'gzip, deflate';
+	}
+
+	if (body != null && typeof body == 'object' && body.constructor === Object) {
+		body = JSON.stringify(body);
+		if (util.isUndefined(headers['content-type'])) {
+			headers['content-type'] = 'application/json';
+		}
+	}
+
+	if (!headers['user-agent']) {
+		headers['user-agent'] = 'nodejs.http,https/htp';
+	}
+
+	let RR = (resolve, reject) => {
 		let timeout = new Timeout(settings);
 
 		let fnDone = (err, entity) => {
 			timeout.clear();
 			if (err) {
 				err.performance = timeout.performance;
-				reject(err);
+				err.action = method + ' ' + urlname;
+				reject && reject(err);
 				callback && callback(err, null);
 			}
 			else {
 				entity.performance = timeout.performance;
-				resolve(entity);
+				resolve && resolve(entity);
 				callback && callback(null, entity);
 			}
 		};
@@ -190,12 +221,6 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 			if (err) {
 				return fnDone(err);
-			}
-
-			if (!headers) {
-				headers = {
-					'Accept-Encoding': 'gzip, deflate'
-				};
 			}
 
 			const options = {
@@ -217,7 +242,6 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				remoteFamily: null,
 				remotePort: null
 			};
-
 
 			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
 				.request(options, (response) => processResponse(timeout, response, fnDone));
@@ -257,12 +281,13 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			else if (typeof body === 'string' || body instanceof Buffer) {
 				clientRequest.end(body);
 			}
-			else { // body instanceof stream.Readable
+			else if (body instanceof stream.Readable) {
 				body.pipe(clientRequest);
 			}
 		});
+	};
 
-	});
+	return callback ? RR() : new Promise(RR);
 };
 
 // ---------------------------
@@ -276,11 +301,20 @@ const easyRequest = overload2()
 		}
 	)
 
-	// Methods requiring payloads.
+	// HEADERS should be a primary object, however sometimes BODY looks alike with HEADERS.
+	// If there is only one object following URL, how can I know it is HEADERS or BODY?
+	//
+	// For methods requiring payloads, the argument BODY is necessary.
+	// So, if there is only one object offered, it will be regarded as BODY.
+	//
+	// For methods not requiring payloads, the argument BODY is not necessary.
+	// And, if there is only one object offered, it will be regarded as HEADERS.
 
-	.overload(HTTP_METHOD_PAYLOAD, URL, HEADERS, BODY, CALLBACK,
+	.overload(HTTP_METHOD, URL, HEADERS, BODY, CALLBACK,
 		function(method, urlname, headers, body, callback) { return baseRequest.call(this, method, urlname, headers, body, callback); }
 	)
+
+	// Methods requiring payloads.
 
 	.overload(HTTP_METHOD_PAYLOAD, URL, HEADERS, BODY,
 		function(method, urlname, headers, body) { return baseRequest.call(this, method, urlname, headers, body, null); }
@@ -294,7 +328,7 @@ const easyRequest = overload2()
 		function(method, urlname, body) { return baseRequest.call(this, method, urlname, null, body, null); }
 	)
 
-	// Methods without payloads.
+	// Methods not requiring payloads.
 
 	.overload(HTTP_METHOD_NO_PAYLOAD, URL, HEADERS, CALLBACK,
 		function(method, urlname, headers, callback) { return baseRequest.call(this, method, urlname, headers, null, callback); }
