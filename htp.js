@@ -23,10 +23,8 @@ const MODULE_REQUIRE = 1
 
 	, ERRORS = require('./ERRORS')
 	, defaultSettings = require('./settings')
+	, METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
 	;
-
-// ---------------------------
-const NON_PAYLOAD_METHODS = ['GET', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE'];
 
 // ---------------------------
 // Datatypes
@@ -38,15 +36,15 @@ const HTTP_METHOD = Type.enum.apply(overload2, http.METHODS);
  * For GET, HEAD, OPTIONS and CONNECT, there are no defined body semantics.
  * For TRACE, body is not supported.
  */
-const HTTP_METHOD_NO_PAYLOAD = Type.enum.apply(null, NON_PAYLOAD_METHODS);
+const HTTP_METHOD_NO_PAYLOAD = Type.enum.apply(null, METHODS_WITHOUT_PAYLOAD);
 
 const HTTP_METHOD_PAYLOAD = Type.and(HTTP_METHOD, Type.not(HTTP_METHOD_NO_PAYLOAD));
 
 const URL = 'string';
 
-const HEADERS = ['object', 'NULL'];
+const HEADERS = ['object', 'NULL', 'UNDEFINED'];
 
-const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL'];
+const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL', 'UNDEFINED'];
 
 const CALLBACK = Function;
 
@@ -74,7 +72,7 @@ const processResponse = function(timeout, response, callback) {
 
 	// Firstly, we should analyse headers to retrive necessary control info.
 	let headers = response.headers;
-
+	
 	if (headers['content-length']) {
 		content.length = 0 + headers['content-length'];
 	}
@@ -149,12 +147,15 @@ const processResponse = function(timeout, response, callback) {
 };
 
 const parseBody = function(buf, content) {
+	let body = buf.toString(content.charset);
 	if (content.type === 'application/json') {
-		return JSON.parse(buf.toString(content.charset));
+		try {
+			body = JSON.parse(body);
+		} catch(ex) {
+			// DO NOTHING.
+		}
 	}
-	else {
-		return buf.toString(content.charset);
-	}
+	return body;
 };
 
 // ---------------------------
@@ -211,8 +212,39 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		};
 		fnDone = once(fnDone);
 
+		// Validate the urlname.
+		// Complete the urlname with defualt settings if necessary.
+		if (1) {
+			/^((http:|https:)?(\/\/))?/.test(urlname);
+
+			// If both protocol and host are not specified,
+			// use protocol, hostname and port predefined in settings to complete the url.
+			if (RegExp.$1 == '') {
+				// Because hostname has NO default value, so,
+				// if hostname not predefined in settings, the uncompleted url without hostname is bad.
+				if (!settings.hostname) {
+					return fnDone(new ERRORS.BADURL(urlname));
+				}
+
+				let host = settings.hostname;
+				if (settings.port) {
+					host += `:${settings.port}`;
+				}
+
+				if (urlname.charAt(0) != '/') {
+					urlname = `/${urlname}`;
+				}
+				urlname = `${settings.protocol}//${host}${urlname}`;
+			}
+
+			// If protocol omitted.
+			else if (RegExp.$2 == '') {
+				urlname = `${settings.protocol}${urlname}`;
+			}
+		}
+
 		// Get URL infos from urlname.
-		const urlParts = url.parse(urlname);
+		let urlParts = url.parse(urlname);
 
 		timeout.start('REQUEST', fnDone);
 		timeout.start('DNS', fnDone);
@@ -231,16 +263,17 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				path     : urlParts.path,
 
 				method   : method,
-				headers  : headers
+				headers  : headers,
 			};
-			const connection = {
-				localAddress: null,
-				localFamily: null,
-				localPort: null,
 
-				remoteAddress: null,
-				remoteFamily: null,
-				remotePort: null
+			const connection = {
+				localAddress  : null,
+				localFamily   : null,
+				localPort     : null,
+
+				remoteAddress : null,
+				remoteFamily  : null,
+				remotePort    : null,
 			};
 
 			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
@@ -254,7 +287,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 					timeout.end('CONNECT');
 					timeout.start('RESPONSE', fnDone);
 					timeout.start('DATA', fnDone);
-					object2.copyProperties(socket, connection, [ /^remote/, /^local/ ]);
+					Object.assign(connection, object2.clone(socket, [ /^remote/, /^local/ ]));
 				});
 			});
 
@@ -275,7 +308,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				fnDone(err);
 			});
 
-			if (body === null) {
+			if (body === null || body === undefined) {
 				clientRequest.end();
 			}
 			else if (typeof body === 'string' || body instanceof Buffer) {
@@ -293,13 +326,18 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 // ---------------------------
 // Overloading.
 
+function easyRequest_constructor(settings) {
+	this.settings = Object.assign({}, defaultSettings, settings);
+	this.request = easyRequest;
+
+	http.METHODS.forEach((name) => {
+		this[name.toLowerCase()] = lambda(easyRequest, name);
+	});
+}
+
 const easyRequest = overload2()
-	.overload('object',
-		function(settings) {
-			this.settings = object2.extend(defaultSettings, settings);
-			this.request = easyRequest;
-		}
-	)
+	// Create a customized user agent instance.
+	.overload('object', easyRequest_constructor)
 
 	// HEADERS should be a primary object, however sometimes BODY looks alike with HEADERS.
 	// If there is only one object following URL, how can I know it is HEADERS or BODY?
@@ -357,8 +395,4 @@ http.METHODS.forEach((name) => {
 // });
 
 easyRequest.request = easyRequest;
-
-easyRequest.NON_PAYLOAD_METHODS = NON_PAYLOAD_METHODS;
-// easyRequest.ERRORS = ERRORS;
-
 module.exports = easyRequest;

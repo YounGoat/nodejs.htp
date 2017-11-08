@@ -57,12 +57,92 @@ client.request('GET', 'http://www.example.com/', function(err, response) {
 
 ##	API
 
+###	Basic
+
 ```javascript
+// To execute request with default settings.
 htp(
 	/*string*/ REQUSET_METHOD_NAME,
 	/*string*/ URL,
 	/*OPTIONAL object*/ HEADERS,
-	/*OPTIONAL string | object | stream.Readable*/ DATA,
+	/*OPTIONAL string | object | stream.Readable*/ BODY,
 	/*OPTIONAL function*/ CALLBACK
 );
 ```
+
+*	__HEADERS__, __BODY__ and __CALLBACK__ are all optional.
+*	*htp* returns `undefined` while __CALLBACK__ offered, otherwise a promise will be returned.
+*	*htp* distinguishes arguments by their types and order. However, it may be ambiguous if there is one, but only one object argument offered. What is it regarded as, __HEADERS__ or __BODY__? If the method is defined with explicit payload, the object will be regarded as __BODY__, otherwise it will be regarded as __HEADERS__. See [methods-without-payloads.js](./methods-without-payloads.js) for details.
+
+###	Advanced
+
+```javascript
+// Create a customized user-agent.
+var request = new htp({
+	hostname: 'www.example.com',
+});
+
+request.get('/index.html', function(err, response) {
+	// ...
+});
+```
+
+Here are options available when creating a customized user agent:
+
+*	__options.protocol__ ENUM('http', 'https')  
+	Default protocol.
+
+*	__options.hostname__ string  
+	Default hostname (port excluded).
+
+*	__options.port__ number	 
+	Default port.
+
+*	__options.request_timeout__ number (unit: ms)
+	Max time to finish the whole request.  
+
+*	__options.dns_timeout__ number (unit: ms)  
+	Max time to resolve hostname.  
+
+*	__options.plugin_timeout__ number (unit: ms)  
+	Max time to plug into socket.
+
+*	__options.connect_timeout__ number (unit: ms)  
+	Max time to shake-hands with target server.
+
+*	__options.response_timeout__ number (unit: ms)  
+	Max time to recieve the first response from target server.
+
+*	__options.chunk_timeout__ number (unit: ms)  
+	Max time two data chunks.
+
+*	__options.data_timeout__ number (unit: ms)  
+	Max time to receive all data.
+
+See [settings.js](./settings.js) for default values of options.
+
+###	SimpleAgent
+
+```javascript
+var Agent = require('htp/SimpleAgent');
+
+// Create an instance.
+var agent = new Agent({
+	endPoint: 'http://www.example.com/'
+});
+
+var p = agent.get('/index.html');
+p.then(function(bodyBuffer) {
+	console.log(bodyBuffer.toString('utf8'));
+}).catch(function(err) {
+	// ...
+});
+```
+
+Acceptable options in __htp/SimpleAgent__ are:
+
+*	*string* __endPoint__  
+*	*object* __headers__
+*	*object* __query__
+*	*Function* __beforeRequest__({ method, url, headers, body, callback })  
+	If offered, this function will be invoked with an object passed in before real HTTP request starts. The passed in object is made up five properties. The function SHOULD return void or an object made up all or some of the properties. If an object returned, the properties will be used on requesting.

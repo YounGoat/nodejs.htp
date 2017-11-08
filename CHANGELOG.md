@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.0.5] - 2017-11
+
+__htp/SimpleAgent__ added.
+
 ##	[0.0.4] - 2017-10
 
 Add new *action* property to Errors throwed. Value of the property is made up of the method name and the url joined with a whitespace, e.g.

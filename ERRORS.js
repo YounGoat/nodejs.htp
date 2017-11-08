@@ -10,6 +10,11 @@ const MODULE_REQUIRE = 1
 	;
 
 module.exports = {
+
+	BADURL: declareError('HTP.BadUrl', Error, function(url) {
+		this.message = `bad url: ${url}`;
+	}),
+
 	TIMEOUT: declareError('HTP.TimeoutError', Error, function(type, timeout) {
 		this.message = `${type} timeout (exceeded ${timeout}ms)`;
 		this.type = type;
@@ -17,5 +22,5 @@ module.exports = {
 		Object.defineProperty(this, 'stack', {
 			enumerable: false
 		});
-	})
+	}),
 }

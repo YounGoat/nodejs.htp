@@ -8,6 +8,7 @@ const MODULE_REQUIRE = 1
 
 	/* in-package */
 	, htp = require('../../htp')
+	, METHODS_WITHOUT_PAYLOAD = require('../../methods-without-payload')
 	;
 
 module.exports = function(req, res) {
@@ -53,7 +54,7 @@ module.exports = function(req, res) {
 		res.end(buf);
 	};
 
-	if (htp.NON_PAYLOAD_METHODS.indexOf(req.method) >= 0) {
+	if (METHODS_WITHOUT_PAYLOAD.indexOf(req.method) >= 0) {
 		doResponse(req.method);
 	}
 	else {

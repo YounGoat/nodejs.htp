@@ -74,8 +74,17 @@ before((done) => {
 })
 
 describe('Basic request without payload', () => {
-	it('HEAD, url, headers, callback', (done) => {
-		htp.request('HEAD', genUrl('/'), {}, (err, response) => {
+	it('HEAD, url, headers, null, callback', (done) => {
+		htp.request('HEAD', genUrl('/'), {}, null, (err, response) => {
+			// If mothod is HEAD, node.js built-in http.IncomingMessage will not
+			// receive entity body even if it is sent.
+			commonValidate(err, response, 200, '');
+			done();
+		});
+	});
+
+	it('HEAD, url, headers, undefined, callback', (done) => {
+		htp.request('HEAD', genUrl('/'), {}, undefined, (err, response) => {
 			// If mothod is HEAD, node.js built-in http.IncomingMessage will not
 			// receive entity body even if it is sent.
 			commonValidate(err, response, 200, '');
@@ -150,6 +159,15 @@ describe('Basic request with payload', () => {
 		});
 	});
 
+	it('POST, url, null, callback', (done) => {
+		let body = null;
+		let expectResponseBody = '';
+		htp.request('POST', genUrl('/'), body, (err, response) => {
+			commonValidate(err, response, 200, expectResponseBody);
+			done();
+		});
+	});
+
 	it('POST, url, headers, body', (done) => {
 		let body = 'BODY CONTENT';
 		var promise = htp.request('POST', genUrl('/'), {}, body);
@@ -218,15 +236,15 @@ describe('Promise Returned', () => {
 		p.catch((err) => { done(); });
 	});
 });
-//
-// describe('Error Captured', () => {
-// 	it('Hostname not found', (done) => {
-// 		htp.request('HEAD', 'http://null.example.com/', {}, (err, response) => {
-// 			assert.equal('ENOTFOUND', err.code);
-// 			done();
-// 		});
-// 	});
-// });
+
+describe('Error Captured', () => {
+	it('Hostname not found', (done) => {
+		htp.request('HEAD', 'http://null.example.com/', {}, (err, response) => {
+			assert.equal('ENOTFOUND', err.code);
+			done();
+		});
+	});
+});
 
 describe('Timeout Errors', () => {
 	var client = new htp({
