@@ -20,6 +20,7 @@ const MODULE_REQUIRE = 1
 	, lambda = require('./lib/lambda')
 	, once = require('./lib/once')
 	, Timeout = require('./lib/timeout')
+	, Receiver = require('./lib/Receiver')
 
 	, ERRORS = require('./ERRORS')
 	, defaultSettings = require('./settings')
@@ -51,7 +52,7 @@ const CALLBACK = Function;
 // ---------------------------
 // Response processor.
 
-const processResponse = function(timeout, response, callback) {
+const processResponse = function(outputStream, timeout, response, callback) {
 	let entity =
 		{ statusCode: null
 		, statusMessage: null
@@ -121,11 +122,13 @@ const processResponse = function(timeout, response, callback) {
 		onResponseArrived();
 		onChunk();
 		chunks.push(chunk);
+		outputStream && outputStream.push(chunk);
 	});
 
 	source.on('end', () => {
 		onResponseArrived();
 		onChunk();
+		outputStream && outputStream.end();
 		timeout.end('DATA');
 
 		let buf = Buffer.concat(chunks);
@@ -140,7 +143,9 @@ const processResponse = function(timeout, response, callback) {
 		entity.bodyBuffer       = buf;
 
 		timeout.end('REQUEST');
-		callback(null, entity);
+
+		// In streaming mode, we wanna the 'end' event emitted and catched before callback() invoked.
+		outputStream ? process.nextTick(callback, null, entity) : callback(null, entity);
 	});
 
 	response.on('error', callback);
@@ -162,7 +167,12 @@ const parseBody = function(buf, content) {
 // Base request executor.
 
 const baseRequest = function(method, urlname, headers, body, callback) {
-	let settings = (this instanceof easyRequest) ? this.settings : defaultSettings;
+	let settings = (this instanceof easyRequest_constructor) ? this.settings : defaultSettings;
+
+	let outputStream = null;
+	if (settings.piping) {
+		outputStream = new Receiver();
+	}
 
 	if (!headers) {
 		headers = {};
@@ -277,7 +287,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			};
 
 			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
-				.request(options, (response) => processResponse(timeout, response, fnDone));
+				.request(options, (response) => processResponse(outputStream, timeout, response, fnDone));
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
@@ -320,13 +330,23 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		});
 	};
 
-	return callback ? RR() : new Promise(RR);
+	if (outputStream) {
+		RR();
+		return outputStream;
+	}
+	else {
+		return callback ? RR() : new Promise(RR);
+	}
 };
 
 // ---------------------------
 // Overloading.
 
 function easyRequest_constructor(settings) {
+	if (!(this instanceof easyRequest_constructor)) {
+		return new easyRequest_constructor(settings);
+	}
+
 	this.settings = Object.assign({}, defaultSettings, settings);
 	this.request = easyRequest;
 
@@ -385,14 +405,14 @@ const easyRequest = overload2()
 	)
 	;
 
+const pipingRequest = new easyRequest_constructor({ piping: true })
+easyRequest.piping = easyRequest.bind(pipingRequest);
+
 http.METHODS.forEach((name) => {
 	easyRequest[name.toLowerCase()] = lambda(easyRequest, name);
+	easyRequest['piping' + name.charAt(0).toUpperCase() + name.substr(1).toLowerCase()] = lambda(easyRequest, name).bind(pipingRequest);
+	easyRequest.piping[name.toLowerCase()] = lambda(easyRequest, name).bind(pipingRequest);
 });
-
-// easyRequest.get('http://job.ares.fx.ctripcorp.com/urlParts/package?group=demo&name=mix', function(err, res) {
-// 	console.log(res.statusCode);
-// 	console.log(res.body);
-// });
 
 easyRequest.request = easyRequest;
 module.exports = easyRequest;

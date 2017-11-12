@@ -1,6 +1,9 @@
 // Unit: milli-second
 module.exports = {
 
+	// Whether to return the response stream 
+	"piping" : false,
+
 	// Default protocol.
 	"protocol": "http:",
 

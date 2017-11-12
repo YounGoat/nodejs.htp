@@ -57,7 +57,12 @@ client.request('GET', 'http://www.example.com/', function(err, response) {
 
 ##	API
 
-###	Basic
+*	[Basic API](#basic-api)
+*	[Piping API](#piping-api)
+*	[Advanced API](#advanced-api)
+*	[Class SimpleAgent](#class-simpleagent)
+
+###	Basic API
 
 ```javascript
 // To execute request with default settings.
@@ -74,7 +79,38 @@ htp(
 *	*htp* returns `undefined` while __CALLBACK__ offered, otherwise a promise will be returned.
 *	*htp* distinguishes arguments by their types and order. However, it may be ambiguous if there is one, but only one object argument offered. What is it regarded as, __HEADERS__ or __BODY__? If the method is defined with explicit payload, the object will be regarded as __BODY__, otherwise it will be regarded as __HEADERS__. See [methods-without-payloads.js](./methods-without-payloads.js) for details.
 
-###	Advanced
+Another style maybe many coders prefer to is `htp.<lowercase_method_name>( /* ... */ )`, e.g.
+```javascript
+htp.get('http://www.example.com/', function(error, response) {
+	// ...
+});
+```
+
+Without CALLBACK offered, __htp__ will return a promise.
+```javascript
+htp.get('http://www.example.com/')
+	.then(function(response) { /* ... */ })
+	.catch(function(error) { /* ... */ })
+	;
+```
+
+###	Piping API
+
+Since v0.1.0, a streamable subset __htp.piping__ is available. Whether or not CALLBACK offered, it will always return a readable stream.
+```javascript
+htp.piping
+	.get('http://download.example.com/data.json')
+	.pipe(fs.createWriteStream('data.json'))
+	;
+
+// A property function named with "piping" prefixed (in camelCase) is equivalent.
+htp
+	.pipingGet('http://download.example.com/data.json')
+	.pipe(fs.createWriteStream('data.json'))
+	；
+```
+
+###	Advanced API
 
 ```javascript
 // Create a customized user-agent.
@@ -97,6 +133,9 @@ Here are options available when creating a customized user agent:
 
 *	__options.port__ number	 
 	Default port.
+
+*	__options.piping__ boolean  
+	If set true, a readable stream will be returned whether or not CALLBACK is present. Otherwise, a promise will be returned when CALLBACK is absent.
 
 *	__options.request_timeout__ number (unit: ms)
 	Max time to finish the whole request.  
@@ -121,7 +160,7 @@ Here are options available when creating a customized user agent:
 
 See [settings.js](./settings.js) for default values of options.
 
-###	SimpleAgent
+###	Class SimpleAgent
 
 ```javascript
 var Agent = require('htp/SimpleAgent');
@@ -139,7 +178,7 @@ p.then(function(bodyBuffer) {
 });
 ```
 
-Acceptable options in __htp/SimpleAgent__ are:
+Acceptable options accepted by __htp/SimpleAgent__ are:
 
 *	*string* __endPoint__  
 *	*object* __headers__

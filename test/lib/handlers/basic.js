@@ -7,8 +7,7 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 
 	/* in-package */
-	, htp = require('../../htp')
-	, METHODS_WITHOUT_PAYLOAD = require('../../methods-without-payload')
+	, METHODS_WITHOUT_PAYLOAD = require('../../../methods-without-payload')
 	;
 
 module.exports = function(req, res) {
@@ -25,7 +24,7 @@ module.exports = function(req, res) {
 		case '/timeout/data':
 			// Response continues without being ended.
 			res.write('CHUNK');
-			setInterval(function() { res.write('CHUNK'); }, 100);
+			setInterval(() => res.write('CHUNK'), 100);
 			return;
 	}
 
