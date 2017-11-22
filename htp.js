@@ -52,7 +52,7 @@ const CALLBACK = Function;
 // ---------------------------
 // Response processor.
 
-const processResponse = function(outputStream, timeout, response, callback) {
+const processResponse = function(bodyStream, timeout, response, callback) {
 	let entity =
 		{ statusCode: null
 		, statusMessage: null
@@ -72,7 +72,10 @@ const processResponse = function(outputStream, timeout, response, callback) {
 		};
 
 	// Firstly, we should analyse headers to retrive necessary control info.
-	let headers = response.headers;
+	let headers = {};
+	for (let name in response.headers) {
+		headers[ name.toLowerCase() ] = response.headers[name];
+	}
 	
 	if (headers['content-length']) {
 		content.length = 0 + headers['content-length'];
@@ -122,13 +125,13 @@ const processResponse = function(outputStream, timeout, response, callback) {
 		onResponseArrived();
 		onChunk();
 		chunks.push(chunk);
-		outputStream && outputStream.push(chunk);
+		bodyStream && bodyStream.push(chunk);
 	});
 
 	source.on('end', () => {
 		onResponseArrived();
 		onChunk();
-		outputStream && outputStream.end();
+		bodyStream && bodyStream.end();
 		timeout.end('DATA');
 
 		let buf = Buffer.concat(chunks);
@@ -145,7 +148,7 @@ const processResponse = function(outputStream, timeout, response, callback) {
 		timeout.end('REQUEST');
 
 		// In streaming mode, we wanna the 'end' event emitted and catched before callback() invoked.
-		outputStream ? process.nextTick(callback, null, entity) : callback(null, entity);
+		bodyStream ? process.nextTick(callback, null, entity) : callback(null, entity);
 	});
 
 	response.on('error', callback);
@@ -169,9 +172,9 @@ const parseBody = function(buf, content) {
 const baseRequest = function(method, urlname, headers, body, callback) {
 	let settings = (this instanceof easyRequest_constructor) ? this.settings : defaultSettings;
 
-	let outputStream = null;
+	let bodyStream = null;
 	if (settings.piping) {
-		outputStream = new Receiver();
+		bodyStream = new Receiver();
 	}
 
 	if (!headers) {
@@ -287,7 +290,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			};
 
 			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
-				.request(options, (response) => processResponse(outputStream, timeout, response, fnDone));
+				.request(options, (response) => processResponse(bodyStream, timeout, response, fnDone));
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
@@ -330,9 +333,9 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		});
 	};
 
-	if (outputStream) {
+	if (bodyStream) {
 		RR();
-		return outputStream;
+		return bodyStream;
 	}
 	else {
 		return callback ? RR() : new Promise(RR);
@@ -405,7 +408,7 @@ const easyRequest = overload2()
 	)
 	;
 
-const pipingRequest = new easyRequest_constructor({ piping: true })
+const pipingRequest = new easyRequest_constructor({ piping: true });
 easyRequest.piping = easyRequest.bind(pipingRequest);
 
 http.METHODS.forEach((name) => {

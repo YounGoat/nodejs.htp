@@ -2,6 +2,12 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.1.1] - Nov 23, 2017
+
+###	Fixed
+
+*	In previous versions, __htp__ cannot recognized some key fields in response headers if their names are not lowercased. 
+
 ##	[0.1.0] - 2017-11-12
 
 ###	Milestone

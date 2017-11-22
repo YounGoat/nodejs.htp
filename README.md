@@ -125,42 +125,44 @@ request.get('/index.html', function(err, response) {
 
 Here are options available when creating a customized user agent:
 
-*	__options.protocol__ ENUM('http', 'https')  
+*	__options.protocol__ *ENUM*('http', 'https')  
 	Default protocol.
 
-*	__options.hostname__ string  
+*	__options.hostname__ *string*  
 	Default hostname (port excluded).
 
-*	__options.port__ number	 
+*	__options.port__ *number*	 
 	Default port.
 
-*	__options.piping__ boolean  
+*	__options.piping__ *boolean*  
 	If set true, a readable stream will be returned whether or not CALLBACK is present. Otherwise, a promise will be returned when CALLBACK is absent.
 
-*	__options.request_timeout__ number (unit: ms)
+*	__options.request_timeout__ *number* (unit: ms)  
 	Max time to finish the whole request.  
 
-*	__options.dns_timeout__ number (unit: ms)  
+*	__options.dns_timeout__ *number* (unit: ms)  
 	Max time to resolve hostname.  
 
-*	__options.plugin_timeout__ number (unit: ms)  
+*	__options.plugin_timeout__ *number* (unit: ms)  
 	Max time to plug into socket.
 
-*	__options.connect_timeout__ number (unit: ms)  
+*	__options.connect_timeout__ *number* (unit: ms)  
 	Max time to shake-hands with target server.
 
-*	__options.response_timeout__ number (unit: ms)  
+*	__options.response_timeout__ *number* (unit: ms)  
 	Max time to recieve the first response from target server.
 
-*	__options.chunk_timeout__ number (unit: ms)  
+*	__options.chunk_timeout__ *number* (unit: ms)  
 	Max time two data chunks.
 
-*	__options.data_timeout__ number (unit: ms)  
+*	__options.data_timeout__ *number* (unit: ms)  
 	Max time to receive all data.
 
 See [settings.js](./settings.js) for default values of options.
 
 ###	Class SimpleAgent
+
+By creating an instance of __SimpleAgent__, developers are able to create a customized and resuable __htp__.
 
 ```javascript
 var Agent = require('htp/SimpleAgent');
