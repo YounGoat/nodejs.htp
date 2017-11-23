@@ -12,6 +12,7 @@ const MODULE_REQUIRE = 1
     /* in-package */
     , htp = require('./htp')
     , METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
+    , once = require('./lib/once')
     ;
 
 /**
@@ -152,7 +153,7 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
         let done = (err, body, headers) => {
             err ? reject && reject(err) : resolve && resolve(body, headers);
 			callback && callback(err, body, headers);
-        };        
+        };
 
         let args = [ method, urlname ];
         
@@ -165,9 +166,8 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
             args.push(body);
         }
 
-        htp.apply(null, args)
-            .then(response => done(null, response))
-            .catch(done);
+        args.push(done);
+        htp.apply(null, args);
     };
     return callback ? RR() : new Promise(RR);
 };

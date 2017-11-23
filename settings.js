@@ -4,6 +4,9 @@ module.exports = {
 	// Whether to return the response stream 
 	"piping" : false,
 
+	// When set true, htp will not stage response body in piping mode.
+	"pipingOnly": false,
+
 	// Default protocol.
 	"protocol": "http:",
 

@@ -52,15 +52,15 @@ const CALLBACK = Function;
 // ---------------------------
 // Response processor.
 
-const processResponse = function(bodyStream, timeout, response, callback) {
+const processResponse = function(settings, bodyStream, timeout, response, callback) {	
 	let entity =
-		{ statusCode: null
-		, statusMessage: null
-		, httpVersion: null
-		, headers: null
-		, body: null
-		, bodyDecompressed: false
-		, bodyBuffer: null
+		{ statusCode: response.statusCode
+		, statusMessage: response.statusMessage
+		, httpVersion: response.httpVersion
+		, headers: response.headers
+		// , body: null
+		// , bodyDecompressed: false
+		// , bodyBuffer: null
 		};
 
 	let content =
@@ -70,6 +70,8 @@ const processResponse = function(bodyStream, timeout, response, callback) {
 		, boundary: null
 		, encoding: null
 		};
+
+	let staging = !settings.piping || !settings.pipingOnly;
 
 	// Firstly, we should analyse headers to retrive necessary control info.
 	let headers = {};
@@ -113,6 +115,7 @@ const processResponse = function(bodyStream, timeout, response, callback) {
 	let chunks = [];
 	let onResponseArrived = once(() => {
 		timeout.end('RESPONSE');
+		bodyStream && bodyStream.emit('response', entity);		
 	});
 	let onChunk = () => {
 		try {
@@ -124,7 +127,7 @@ const processResponse = function(bodyStream, timeout, response, callback) {
 	source.on('data', (chunk) => {
 		onResponseArrived();
 		onChunk();
-		chunks.push(chunk);
+		staging && chunks.push(chunk);
 		bodyStream && bodyStream.push(chunk);
 	});
 
@@ -134,16 +137,14 @@ const processResponse = function(bodyStream, timeout, response, callback) {
 		bodyStream && bodyStream.end();
 		timeout.end('DATA');
 
-		let buf = Buffer.concat(chunks);
-		let body = parseBody(buf, content);
+		if (staging) {
+			let buf = Buffer.concat(chunks);
+			let body = parseBody(buf, content);
 
-		entity.statusCode       = response.statusCode;
-		entity.statusMessage    = response.statusMessage;
-		entity.httpVersion      = response.httpVersion;
-		entity.headers          = response.headers;
-		entity.body             = body;
-		entity.bodyDecompressed = decompressed;
-		entity.bodyBuffer       = buf;
+			entity.body             = body;
+			entity.bodyDecompressed = decompressed;
+			entity.bodyBuffer       = buf;
+		}
 
 		timeout.end('REQUEST');
 
@@ -151,7 +152,10 @@ const processResponse = function(bodyStream, timeout, response, callback) {
 		bodyStream ? process.nextTick(callback, null, entity) : callback(null, entity);
 	});
 
-	response.on('error', callback);
+	response.on('error', (error) => {
+		bodyStream && bodyStream.emit('error', error);
+		callback(error);
+	});
 };
 
 const parseBody = function(buf, content) {
@@ -176,6 +180,9 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 	if (settings.piping) {
 		bodyStream = new Receiver();
 	}
+	let emitOnBodyStream = (eventName, data) => {
+		bodyStream && bodyStream.emit(eventName, data);
+	};
 
 	if (!headers) {
 		headers = {};
@@ -263,6 +270,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		timeout.start('DNS', fnDone);
 		dns.lookup(urlParts.hostname, (err, /*string*/ address, /*int*/ family) => {
 			timeout.end('DNS');
+			emitOnBodyStream('dns');
 
 			if (err) {
 				return fnDone(err);
@@ -290,14 +298,16 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			};
 
 			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
-				.request(options, (response) => processResponse(bodyStream, timeout, response, fnDone));
+				.request(options, (response) => processResponse(settings, bodyStream, timeout, response, fnDone));
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
 				timeout.end('PLUGIN');
 				timeout.start('CONNECT', fnDone);
-				socket.on('connect', function() {
+				socket.on('connect', function(event) {
 					timeout.end('CONNECT');
+					emitOnBodyStream('connect');
+					
 					timeout.start('RESPONSE', fnDone);
 					timeout.start('DATA', fnDone);
 					Object.assign(connection, object2.clone(socket, [ /^remote/, /^local/ ]));
@@ -318,6 +328,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			// });
 
 			clientRequest.on('error', function(err) {
+				emitOnBodyStream('error', err);
 				fnDone(err);
 			});
 
@@ -408,13 +419,23 @@ const easyRequest = overload2()
 	)
 	;
 
-const pipingRequest = new easyRequest_constructor({ piping: true });
+const pipingRequest = new easyRequest_constructor({ piping: true, pipingOnly: false });
 easyRequest.piping = easyRequest.bind(pipingRequest);
 
-http.METHODS.forEach((name) => {
-	easyRequest[name.toLowerCase()] = lambda(easyRequest, name);
-	easyRequest['piping' + name.charAt(0).toUpperCase() + name.substr(1).toLowerCase()] = lambda(easyRequest, name).bind(pipingRequest);
-	easyRequest.piping[name.toLowerCase()] = lambda(easyRequest, name).bind(pipingRequest);
+const pipingOnlyRequest = new easyRequest_constructor({ piping: true, pipingOnly: true });
+easyRequest.pipingOnly = easyRequest.bind(pipingOnlyRequest);
+
+http.METHODS.forEach((NAME) => {
+	let Name = NAME.charAt(0).toUpperCase() + NAME.substr(1).toLowerCase();
+	let name = NAME.toLowerCase();
+
+	easyRequest[name] = lambda(easyRequest, NAME);
+	
+	easyRequest[`piping${Name}`] = lambda(easyRequest, NAME).bind(pipingRequest);
+	easyRequest.piping[name] = lambda(easyRequest, NAME).bind(pipingRequest);
+	
+	easyRequest[`pipingOnly${Name}`] = lambda(easyRequest, NAME).bind(pipingOnlyRequest);
+	easyRequest.pipingOnly[name] = lambda(easyRequest, NAME).bind(pipingOnlyRequest);
 });
 
 easyRequest.request = easyRequest;

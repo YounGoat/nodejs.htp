@@ -10,27 +10,23 @@ __Maybe the easiest but still strong http client you have ever meet.__
 [![build status of github.com/YounGoat/nodejs.htp](https://travis-ci.org/YounGoat/nodejs.htp.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.htp)
 [![star github.com/YounGoat/nodejs.htp](https://img.shields.io/github/stars/YounGoat/nodejs.htp.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.htp/stargazers)
 
-[简体中文](./README.zh_CN.md)
+[英语](./README.md)
 
-##	Table of contents
+##	目录
 
-*	[Get Started](#get-started)
+*	[快速开始](#快速开始)
 *	[API](#api)
 	-	[Basic API](#basic-api)
 	-	[Piping API](#piping-api)
 	-	[Advanced API](#advanced-api)
 	-	[Class SimpleAgent](#class-simpleagent)
-*	[Why htp](#why-htp)
-*	[Honorable Dependents](#honorable-dependents)
-*	[About](#about)
-*	[References](#references)
 
-##	Links
+##	链接
 
-*	[CHANGE LOG](./CHANGELOG.md)
-*	[Homepage](https://github.com/YounGoat/nodejs.htp)
+*	[更新日志](./CHANGELOG.md)
+*	[主页](https://github.com/YounGoat/nodejs.htp)
 
-##	Get Started
+##	快速开始
 
 ```javascript
 var htp = requrie('htp');
@@ -85,18 +81,18 @@ htp(
 );
 ```
 
-*	*HEADERS*, *BODY* and *CALLBACK* are all optional.
-*	__htp__ returns `undefined` while *CALLBACK* offered, otherwise a promise will be returned.
-*	__htp__ distinguishes arguments by their types and order. However, it may be ambiguous if there is one, but only one object argument offered. What is it regarded as, *HEADERS* or *BODY*? If the method is defined with explicit payload, the object will be regarded as *BODY*, otherwise it will be regarded as *HEADERS*. See [methods-without-payloads.js](./methods-without-payloads.js) for details.
+*	*HEADERS*, *BODY* 以及 *CALLBACK* 参数是可选的。
+*	如果 *CALLBACK* 缺省，__htp__ 返回 `undefined`；否则返回 `Promise` 实例。
+*	__htp__ 依赖参数的类型与次序区分其含义。当实参列表中有且仅一个对象类型参数时，如果此时的 HTTP 方法要求携带载荷（比如 POST 方法），则该对象参数将被视为 *BODY*，否则将被视为 *HEADERS*。请参考 [methods-without-payloads.js](./methods-without-payloads.js) 以获取更多细节.
 
-Another style maybe many coders prefer to is `htp.<lowercase_method_name>( /* ... */ )`, e.g.
+我们还可以使用形如 `htp.<lowercase_method_name>( /* ... */ )` 的语法, e.g.
 ```javascript
 htp.get('http://www.example.com/', function(error, response) {
 	// ...
 });
 ```
 
-Without *CALLBACK* offered, __htp__ will return a promise.
+当缺省 *CALLBACK* 参数时，__htp__ 返回一个 `Promise` 实例：
 ```javascript
 htp.get('http://www.example.com/')
 	.then(function(response) { /* ... */ })
@@ -106,7 +102,8 @@ htp.get('http://www.example.com/')
 
 ###	Piping API
 
-Since v0.1.0, a streamable subset __htp.piping__ is available. Whether or not *CALLBACK* offered, it will always return a readable stream.
+从 v0.1.0 开始，我们可以通过 __htp.piping__ 实现对响应数据的流式处理。无论调用的时候是否提供 *CALLBACK* 参数，该系统方法均会返回一个可读流对象。
+
 ```javascript
 htp.piping
 	.get('http://download.example.com/data.json')
@@ -123,12 +120,13 @@ htp
 	；
 ```
 
-The return stream may emit following events:
+返回的可读流对象支持以下事件：
 
 *	__dns__
 *	__connect__
-*	__response__ along with argument *response* which is a subset of the final response object.
-*	events which a readable stream may emit, see [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable) for details.
+*	__response__ 携带一个对象类型参数 response，该对象是最终响应对象的真子集。
+*	可读流对象默认支持的其他事件，参见 [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable)。
+
 
 ###	Advanced API
 
@@ -143,49 +141,49 @@ request.get('/index.html', function(err, response) {
 });
 ```
 
-Here are options available when creating a customized user agent:
+以下选项可以用来定制用户代理：
 
 *	__options.protocol__ *ENUM*('http', 'https')  
-	Default protocol.
+	默认协议。
 
 *	__options.hostname__ *string*  
-	Default hostname (port excluded).
+	默认主机名（不含端口号）。
 
 *	__options.port__ *number*	 
-	Default port.
+	默认端口号。
 
-*	__options.piping__ *boolean*  
-	If set true, a readable stream will be returned whether or not *CALLBACK* is present. Otherwise, a promise will be returned when *CALLBACK* is absent.
+*	__options.piping__ *boolean*   
+	此开关开启时，__htp__ 会返回一个可读流对象，以支持透过管道读取响应中的载荷数据。
 
 *	__options.pipingOnly__ *boolean*  
-	Only effective in piping mode. If set true, reponse data will no longer be staged and returned, and argument *response* passed to *CALLBACK* will no longer have properties `{ body, bodyBuffer, bodyDcompressed }`. You can only obtain response data through pipe.
+	此开关仅在 piping 模式下有效。开启时，响应数据将不再被缓存和返回，*CALLBACK* 中传递的 __response__ 对象不再包含 `{ body, bodyBuffer, bodyDcompressed }` 属性。你只能透过管道获取响应数据。
 
 *	__options.request_timeout__ *number* (unit: ms)  
-	Max time to finish the whole request.  
+	请求从发起到接收响应完毕的最大允许时间。
 
 *	__options.dns_timeout__ *number* (unit: ms)  
-	Max time to resolve hostname.  
+	用于解析主机名的最大允许时间。
 
 *	__options.plugin_timeout__ *number* (unit: ms)  
-	Max time to plug into socket.
+	用于打开 socket 的最大允许时间。
 
 *	__options.connect_timeout__ *number* (unit: ms)  
-	Max time to shake-hands with target server.
+	用于与目标服务完成握手的最大允许时间。
 
 *	__options.response_timeout__ *number* (unit: ms)  
-	Max time to recieve the first response from target server.
+	从发起请求到首个响应数据块抵达的最大允许时间。
 
 *	__options.chunk_timeout__ *number* (unit: ms)  
-	Max time two data chunks.
+	两个响应数据块之间的最大允许时间间隔。
 
 *	__options.data_timeout__ *number* (unit: ms)  
-	Max time to receive all data.
+	从开始接收数据到所有数据接收完毕的最大允许时间。
 
-See [settings.js](./settings.js) for default values of options.
+请查阅 [settings.js](./settings.js) 以获取上述选项的默认值。
 
 ###	Class SimpleAgent
 
-By creating an instance of __SimpleAgent__, developers are able to create a customized and resuable __htp__.
+通过实例化 __SimpleAgent__ 类，开发者可以创建一个定制化、可利用的用户代理。
 
 ```javascript
 var Agent = require('htp/SimpleAgent');
@@ -203,18 +201,11 @@ p.then(function(bodyBuffer) {
 });
 ```
 
-Acceptable options accepted by __htp/SimpleAgent__ are:
+实例化 __htp/SimpleAgent__ 时可以使用以下选项： 
 
 *	*string* __endPoint__  
-*	*object* __headers__
+*	*object* *HEADERS*
 *	*object* __query__
 *	*Function* __beforeRequest__({ method, url, headers, body, callback })  
-	If offered, this function will be invoked with an object passed in before real HTTP request starts. The passed in object is made up five properties. The function SHOULD return void or an object made up all or some of the properties. If an object returned, the properties will be used on requesting.
+	该方法将在发起 HTTP 请求前被调用，传入的对象包含 5 个属性。该方法 __应当__ 返回 `void` 或是由上述全部或部分属性组成的对象，这些返回的属性将被应用于即将发起的 HTTP 请求。
 
-##  Why __htp__
-
-##  Honorable Dependents
-
-##  About
-
-##  References

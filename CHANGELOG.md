@@ -2,6 +2,22 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.2.0]
+
+###	New
+
+*	Byeond *basic* and *piping* mode, new *pipingOnly* mode is offered.
+*	Returned stream in *piping* mode will emit events and may be catched via `on(<eventName>, ...)` method.
+*	[README in Simplifed Chinese language](./README.zh_CN.md).
+
+###	Fixed
+
+*	In previous version, `htp/SimpleAgent` will invoke `callback()` (if passed) twice if there is some exception throwed in `callback()` itself.
+
+###	What is difference between *piping* and *pipingOnly* ?
+
+In *piping* mode, you may get data via piping to a writable stream, or reading `response.body` and `response.bodyBuffer` directly in function `callback(err, response)` which is passed as the last argument.
+
 ##	[0.1.1] - Nov 23, 2017
 
 ###	Fixed

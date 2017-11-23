@@ -1,6 +1,6 @@
 {
     "name": "htp",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "Easy http/https client",
     "main": "htp.js",
     "directories": {

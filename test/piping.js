@@ -27,7 +27,7 @@ after((done) => {
     httpServer.stop(done);
 });
 
-describe('Pipe Style', function() {
+describe('piping mode', function() {
 	it('GET', (done) => {
 		let bodyBuffer = null;
 		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
@@ -42,5 +42,30 @@ describe('Pipe Style', function() {
 		output.on('end', () => {
 			bodyBuffer = Buffer.concat(chunks);
 		});
+	});
+
+	it('events', (done) => {
+		let events = [];
+		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
+				assert.equal(3, events.length);
+				done();
+			})
+			;
+
+		output
+			.on('dns', () => events.push('dns'))
+			.on('connect', () => events.push('connect'))
+			.on('response', (response) => {
+				events.push('response');
+			})
+			;
+	});
+
+	it('pipingOnly', (done) => {
+		let output = htp.pipingOnlyGet(httpServer.genUrl('/streaming'), (err, res) => {
+			assert.equal(undefined, res.body);
+			done();
+		})
+		;
 	});
 });
