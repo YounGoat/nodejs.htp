@@ -17,14 +17,23 @@ const MODULE_REQUIRE = 1
 
 /**
  * 
- * @param {object} options 
- * @param {string} options.endPoint
- * @param {object} options.headers
- * @param {object} options.query
+ * @param {object}   options 
+ * @param {Function} options.beforeRequest
+ * @param {string}   options.endPoint
+ * @param {object}   options.headers
+ * @param {object}   options.query
+ * @param {object}   options.settings
  */
 function SimpleAgent(options) {
 	// Clone and uniform the input options.
     this.options = cloneObject(options, (key, value) => [ key.toLowerCase(), value ]);
+
+    if (this.options.settings) {
+        this.htp = new htp(this.options.settings);
+    }
+    else {
+        this.htp = htp;
+    }
 }
 
 SimpleAgent.prototype.request = function(method, urlname, headers, body, callback) {
@@ -149,12 +158,29 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
 
     // ---------------------------
 
-    let RR = (resolve, reject) => {
-        let done = (err, body, headers) => {
-            err ? reject && reject(err) : resolve && resolve(body, headers);
-			callback && callback(err, body, headers);
-        };
+    // let RR = (resolve, reject) => {
+    //     let done = (err, body, headers) => {
+    //         err ? reject && reject(err) : resolve && resolve(body, headers);
+	// 		callback && callback(err, body, headers);
+    //     };
 
+    //     let args = [ method, urlname ];
+        
+    //     if (this.options.headers || headers) {
+    //         headers = Object.assign({}, headers, this.options.headers);
+    //         args.push(headers);
+    //     }
+
+    //     if (body) {
+    //         args.push(body);
+    //     }
+
+    //     args.push(done);
+    //     this.htp.apply(this.htp, args);
+    // };
+    // return callback ? RR() : new Promise(RR);
+
+    if (1) {
         let args = [ method, urlname ];
         
         if (this.options.headers || headers) {
@@ -166,10 +192,12 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
             args.push(body);
         }
 
-        args.push(done);
-        htp.apply(null, args);
-    };
-    return callback ? RR() : new Promise(RR);
+        if (callback) {
+            args.push(callback);
+        }
+
+        return this.htp.request.apply(this.htp, args);
+    }
 };
 
 // According HTTP methods' names, add homonymous method to the prototype.

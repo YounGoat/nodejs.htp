@@ -10,7 +10,7 @@ __Maybe the easiest but still strong http client you have ever meet.__
 [![build status of github.com/YounGoat/nodejs.htp](https://travis-ci.org/YounGoat/nodejs.htp.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.htp)
 [![star github.com/YounGoat/nodejs.htp](https://img.shields.io/github/stars/YounGoat/nodejs.htp.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.htp/stargazers)
 
-[英语](./README.md)
+其他语言 / [English](./README.md)
 
 ##	目录
 
@@ -124,8 +124,10 @@ htp
 
 *	__dns__
 *	__connect__
-*	__response__ 携带一个对象类型参数 response，该对象是最终响应对象的真子集。
-*	可读流对象默认支持的其他事件，参见 [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable)。
+*	__response__  
+	携带一个对象类型参数 response，该对象是最终响应对象的真子集。
+*	可读流对象默认支持的其他事件  
+	参见 [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable)。
 
 
 ###	Advanced API
@@ -203,9 +205,10 @@ p.then(function(bodyBuffer) {
 
 实例化 __htp/SimpleAgent__ 时可以使用以下选项： 
 
-*	*string* __endPoint__  
-*	*object* *HEADERS*
-*	*object* __query__
 *	*Function* __beforeRequest__({ method, url, headers, body, callback })  
 	该方法将在发起 HTTP 请求前被调用，传入的对象包含 5 个属性。该方法 __应当__ 返回 `void` 或是由上述全部或部分属性组成的对象，这些返回的属性将被应用于即将发起的 HTTP 请求。
-
+*	*string* __endPoint__  
+*	*object* __headers__
+*	*object* __query__
+*	*object* __settings__  
+	用于定制用户代理的参数，参见 [Advanced API](#advanced-api) 一节。

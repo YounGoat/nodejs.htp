@@ -10,7 +10,7 @@ __Maybe the easiest but still strong http client you have ever meet.__
 [![build status of github.com/YounGoat/nodejs.htp](https://travis-ci.org/YounGoat/nodejs.htp.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.htp)
 [![star github.com/YounGoat/nodejs.htp](https://img.shields.io/github/stars/YounGoat/nodejs.htp.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.htp/stargazers)
 
-[简体中文](./README.zh_CN.md)
+Languages / [简体中文](./README.zh_CN.md)
 
 ##	Table of contents
 
@@ -127,8 +127,10 @@ The return stream may emit following events:
 
 *	__dns__
 *	__connect__
-*	__response__ along with argument *response* which is a subset of the final response object.
-*	events which a readable stream may emit, see [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable) for details.
+*	__response__  
+	Along with argument *response* which is a subset of the final response object.
+*	events which a readable stream may emit  
+	See [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable) for details.
 
 ###	Advanced API
 
@@ -205,15 +207,19 @@ p.then(function(bodyBuffer) {
 
 Acceptable options accepted by __htp/SimpleAgent__ are:
 
+*	*Function* __beforeRequest__({ method, url, headers, body, callback })  
+	If offered, this function will be invoked with an object passed in before real HTTP request starts. The passed in object is made up five properties. The function SHOULD return void or an object made up all or some of the properties. If an object returned, the properties will be used on requesting.
 *	*string* __endPoint__  
 *	*object* __headers__
 *	*object* __query__
-*	*Function* __beforeRequest__({ method, url, headers, body, callback })  
-	If offered, this function will be invoked with an object passed in before real HTTP request starts. The passed in object is made up five properties. The function SHOULD return void or an object made up all or some of the properties. If an object returned, the properties will be used on requesting.
+*	*object* __settings__  
+	Settings used to customise the user-agent. See [Advanced API](#advanced-api).
 
 ##  Why __htp__
 
 ##  Honorable Dependents
+
+*	[osapi](https://www.npmjs.com/package/osapi)
 
 ##  About
 

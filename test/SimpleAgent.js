@@ -14,5 +14,5 @@ describe('SimpleAgent', () => {
     it('*', () => {
        let agent = new SimpleAgent();
     });
-
+    
 });
