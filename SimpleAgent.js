@@ -38,7 +38,7 @@ function SimpleAgent(options) {
 
 SimpleAgent.prototype.request = function(method, urlname, headers, body, callback) {
     // ---------------------------
-    // Uniform arguments.
+    // Uniform arguments.   
 
     // Will be re-assigned if exist.
     headers = null;

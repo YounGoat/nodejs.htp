@@ -288,7 +288,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				headers  : headers
 			};
 
-			if (urlParts.protocol == 'https') {
+			if (urlParts.protocol == 'https:') {
 				// @see https://nodejs.org/dist/latest/docs/api/tls.html#tls_tls_connect_options_callback
 				Object.assign(options, object2.clone(settings, [ 'rejectUnauthorized' ]));
 			}
