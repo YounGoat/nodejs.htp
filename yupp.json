@@ -1,4 +1,6 @@
 {
+	"name": "htp",
+	"alias": [ "usa" ],
 	"badges": [
 		"npm.*",
 		"github.*"

@@ -127,6 +127,7 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 	source.on('data', (chunk) => {
 		onResponseArrived();
 		onChunk();
+
 		staging && chunks.push(chunk);
 		bodyStream && bodyStream.push(chunk);
 	});
@@ -134,8 +135,8 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 	source.on('end', () => {
 		onResponseArrived();
 		onChunk();
-		bodyStream && bodyStream.end();
 		timeout.end('DATA');
+		bodyStream && bodyStream.end();
 
 		if (staging) {
 			let buf = Buffer.concat(chunks);
@@ -268,7 +269,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 		timeout.start('REQUEST', fnDone);
 		timeout.start('DNS', fnDone);
-		dns.lookup(urlParts.hostname, (err, /*string*/ address, /*int*/ family) => {
+		let onDnsLookup = (err, /*string*/ address, /*int*/ family) => {
 			timeout.end('DNS');
 			emitOnBodyStream('dns');
 
@@ -284,8 +285,13 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				path     : urlParts.path,
 
 				method   : method,
-				headers  : headers,
+				headers  : headers
 			};
+
+			if (urlParts.protocol == 'https') {
+				// @see https://nodejs.org/dist/latest/docs/api/tls.html#tls_tls_connect_options_callback
+				Object.assign(options, object2.clone(settingsm, [ 'rejectUnauthorized' ]));
+			}
 
 			const connection = {
 				localAddress  : null,
@@ -341,7 +347,14 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			else if (body instanceof stream.Readable) {
 				body.pipe(clientRequest);
 			}
-		});
+		};
+
+		// let dnsCache = _dns_caches[urlParts.hostname];
+		// if (Date.now() - dnsCache.time > settings.dns_ttl) {
+		// 	dnsCache = null;
+		// 	delete _dns_caches
+		// }
+		dns.lookup(urlParts.hostname, onDnsLookup);
 	};
 
 	if (bodyStream) {

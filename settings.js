@@ -10,6 +10,9 @@ module.exports = {
 	// Default protocol.
 	"protocol": "http:",
 
+	// Whether to reject unsecure response.
+	"rejectUnauthorized": true,
+
 	// Time used to finish the whole request.
 	// ATTENTION: Time used to hostname resolving test is included.
 	// dns.lookup() -- "end" event
@@ -18,6 +21,9 @@ module.exports = {
 	// Time used to resolve hostname.
 	// dns.lookup() -- address returned
 	"dns_timeout"      :   5000,
+
+	// DNS TTL.
+	"dns_ttl"          : 600000,
 
 	// Time used to plug into socket.
 	// http(s).request() -- "socket" event

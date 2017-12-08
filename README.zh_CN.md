@@ -20,6 +20,7 @@ __Maybe the easiest but still strong http client you have ever meet.__
 	-	[Piping API](#piping-api)
 	-	[Advanced API](#advanced-api)
 	-	[Class SimpleAgent](#class-simpleagent)
+	-	[时间轴](#timeline)
 
 ##	链接
 
@@ -181,6 +182,11 @@ request.get('/index.html', function(err, response) {
 *	__options.data_timeout__ *number* (unit: ms)  
 	从开始接收数据到所有数据接收完毕的最大允许时间。
 
+选自 [tls.connect()](https://nodejs.org/dist/latest/docs/api/tls.html#tls_tls_connect_options_callback) 的部分选项也将被采纳，并应用于 HTTPS 请求中：
+
+*	__options.rejectUnauthorized__ *boolean*  
+	是否拒绝未经认证的（不安全的）响应。
+
 请查阅 [settings.js](./settings.js) 以获取上述选项的默认值。
 
 ###	Class SimpleAgent
@@ -212,3 +218,8 @@ p.then(function(bodyBuffer) {
 *	*object* __query__
 *	*object* __settings__  
 	用于定制用户代理的参数，参见 [Advanced API](#advanced-api) 一节。
+
+###	Timeline
+
+以下是 __htp__ 请求的时间轴示意图：  
+![HTP request process](./docs/htp.png)

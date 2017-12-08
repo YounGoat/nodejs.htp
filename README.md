@@ -20,6 +20,7 @@ Languages / [简体中文](./README.zh_CN.md)
 	-	[Piping API](#piping-api)
 	-	[Advanced API](#advanced-api)
 	-	[Class SimpleAgent](#class-simpleagent)
+	-	[Timeline](#timeline)
 *	[Why htp](#why-htp)
 *	[Honorable Dependents](#honorable-dependents)
 *	[About](#about)
@@ -34,6 +35,8 @@ Languages / [简体中文](./README.zh_CN.md)
 
 ```javascript
 var htp = requrie('htp');
+// OR, since v0.3.0, an alias "usa" is available.
+var htp = require('usa');
 
 // GET & callback
 htp.get('http://www.example.com/', function(err, response) {
@@ -161,7 +164,6 @@ Here are options available when creating a customized user agent:
 
 *	__options.pipingOnly__ *boolean*  
 	Only effective in piping mode. If set true, reponse data will no longer be staged and returned, and argument *response* passed to *CALLBACK* will no longer have properties `{ body, bodyBuffer, bodyDcompressed }`. You can only obtain response data through pipe.
-
 *	__options.request_timeout__ *number* (unit: ms)  
 	Max time to finish the whole request.  
 
@@ -182,6 +184,10 @@ Here are options available when creating a customized user agent:
 
 *	__options.data_timeout__ *number* (unit: ms)  
 	Max time to receive all data.
+
+Some options from [tls.connect()](https://nodejs.org/dist/latest/docs/api/tls.html#tls_tls_connect_options_callback) are also accepted and will be applied on HTTPs requests:
+
+*	__options.rejectUnauthorized__ *boolean*  
 
 See [settings.js](./settings.js) for default values of options.
 
@@ -215,6 +221,11 @@ Acceptable options accepted by __htp/SimpleAgent__ are:
 *	*object* __settings__  
 	Settings used to customise the user-agent. See [Advanced API](#advanced-api).
 
+###	Timeline
+
+Here is the timeline of an __htp__ request:  
+![HTP request process](./docs/htp.png)
+
 ##  Why __htp__
 
 ##  Honorable Dependents
@@ -222,5 +233,12 @@ Acceptable options accepted by __htp/SimpleAgent__ are:
 *	[osapi](https://www.npmjs.com/package/osapi)
 
 ##  About
+
+For convenience, this package has following names (alias):
+*   [htp](https://www.npmjs.com/package/htp)  
+	Because the main business of this package is to execute HTTP/HTTPS requests, I named it *htp* which looks like *http* with double *t* replaced by one.
+
+*   [usa](https://www.npmjs.com/package/usa)  
+	It is not the United States of America. *usa* is abbreviation of *USerAgent*.
 
 ##  References

@@ -19,12 +19,15 @@ module.exports = function(req, res) {
 		case '/timeout/chunk':
 			// Response delays between two chunks.
 			res.write('CHUNK');
+			// No more chunks sent after the first one.
 			return;
 
 		case '/timeout/data':
 			// Response continues without being ended.
 			res.write('CHUNK');
-			setInterval(() => res.write('CHUNK'), 100);
+			setInterval(() => {
+				res.write('CHUNK\r\n');
+			}, 100);
 			return;
 	}
 
