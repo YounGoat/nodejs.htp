@@ -13,6 +13,7 @@ const MODULE_REQUIRE = 1
 
 	/* NPM */
 	, overload2 = require('overload2')
+	, DnsAgent = require('dns-agent')
 	, Type = overload2.Type
 
 	/* in-package */
@@ -48,6 +49,8 @@ const HEADERS = ['object', 'NULL', 'UNDEFINED'];
 const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL', 'UNDEFINED'];
 
 const CALLBACK = Function;
+
+const DNS_AGENT = new DnsAgent({ ttl: defaultSettings.dns_ttl, source: 'system' });
 
 // ---------------------------
 // Response processor.
@@ -175,7 +178,11 @@ const parseBody = function(buf, content) {
 // Base request executor.
 
 const baseRequest = function(method, urlname, headers, body, callback) {
-	let settings = (this instanceof easyRequest_constructor) ? this.settings : defaultSettings;
+	let settings = defaultSettings, dnsAgent = DNS_AGENT;   
+	if (this instanceof easyRequest_constructor) {
+		settings = this.settings;
+		dnsAgent = this.dnsAgent;
+	}
 
 	let bodyStream = null;
 	if (settings.piping) {
@@ -349,12 +356,8 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			}
 		};
 
-		// let dnsCache = _dns_caches[urlParts.hostname];
-		// if (Date.now() - dnsCache.time > settings.dns_ttl) {
-		// 	dnsCache = null;
-		// 	delete _dns_caches
-		// }
-		dns.lookup(urlParts.hostname, onDnsLookup);
+		// dns.lookup(urlParts.hostname, onDnsLookup);
+		dnsAgent.lookup4(urlParts.hostname, onDnsLookup);
 	};
 
 	if (bodyStream) {
@@ -375,6 +378,13 @@ function easyRequest_constructor(settings) {
 	}
 
 	this.settings = Object.assign({}, defaultSettings, settings);
+	if (this.settings.dns_ttl == defaultSettings.dns_ttl) {
+		this.dnsAgent = DNS_AGENT;
+	}
+	else {
+		this.dnsAgent = new DnsAgent({ ttl: this.settings.dns_ttl });
+	}
+
 	this.request = easyRequest;
 
 	http.METHODS.forEach((name) => {

@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.4.0] - Dec 13, 2017
+
+*	[dns-agent](https://www.npmjs.com/package/dns-agent) is depended while __htp__ is resolving domain names.
+
 ##	[0.3.0] - Dec 8, 2017
 
 *	Setting *rejectUnauthorized* added.
