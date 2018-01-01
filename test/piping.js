@@ -53,9 +53,11 @@ describe('piping mode', function() {
 			;
 
 		output
+			.on('error', (e) => console.log('error', e))
 			.on('dns', () => events.push('dns'))
 			.on('connect', () => events.push('connect'))
-			.on('response', (response) => {
+			.on('response', (response) => { 
+				// console.log(response.statusCode); 
 				events.push('response');
 			})
 			;

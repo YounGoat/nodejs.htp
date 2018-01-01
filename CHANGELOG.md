@@ -2,6 +2,13 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.4.1] - Jan 2, 2017
+
+###	Fixed
+
+*	Fixed the bug that, on *piping* mode, event *dns* is missed if hostname has been resolved and cached before.
+*	Fixed the bug that, on *piping* mode, event *error* is missed.
+
 ##	[0.4.0] - Dec 13, 2017
 
 *	[dns-agent](https://www.npmjs.com/package/dns-agent) is depended while __htp__ is resolving domain names.

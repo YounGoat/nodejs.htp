@@ -188,6 +188,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 	if (settings.piping) {
 		bodyStream = new Receiver();
 	}
+	
 	let emitOnBodyStream = (eventName, data) => {
 		bodyStream && bodyStream.emit(eventName, data);
 	};
@@ -229,6 +230,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			if (err) {
 				err.performance = timeout.performance;
 				err.action = method + ' ' + urlname;
+				emitOnBodyStream('error', err);
 				reject && reject(err);
 				callback && callback(err, null);
 			}
@@ -361,7 +363,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 	};
 
 	if (bodyStream) {
-		RR();
+		process.nextTick(RR);
 		return bodyStream;
 	}
 	else {
