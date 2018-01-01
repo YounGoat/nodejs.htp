@@ -280,7 +280,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		timeout.start('DNS', fnDone);
 		let onDnsLookup = (err, /*string*/ address, /*int*/ family) => {
 			timeout.end('DNS');
-			emitOnBodyStream('dns');
+			emitOnBodyStream('dns', { address, family });
 
 			if (err) {
 				return fnDone(err);
@@ -359,7 +359,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		};
 
 		// dns.lookup(urlParts.hostname, onDnsLookup);
-		dnsAgent.lookup4(urlParts.hostname, onDnsLookup);
+		dnsAgent.lookup4(urlParts.hostname, (err, ipv4) => onDnsLookup(err, ipv4, 4));
 	};
 
 	if (bodyStream) {

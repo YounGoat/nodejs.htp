@@ -44,7 +44,7 @@ describe('piping mode', function() {
 		});
 	});
 
-	it('events', (done) => {
+	it.only('events', (done) => {
 		let events = [];
 		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
 				assert.equal(3, events.length);
@@ -54,7 +54,11 @@ describe('piping mode', function() {
 
 		output
 			.on('error', (e) => console.log('error', e))
-			.on('dns', () => events.push('dns'))
+			.on('dns', (info) => {
+				assert(info.address);
+				assert(info.family);
+				events.push('dns');
+			})
 			.on('connect', () => events.push('connect'))
 			.on('response', (response) => { 
 				// console.log(response.statusCode); 

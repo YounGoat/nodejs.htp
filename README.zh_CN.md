@@ -123,10 +123,13 @@ htp
 
 返回的可读流对象支持以下事件：
 
-*	__dns__
-*	__connect__
-*	__response__  
-	携带一个对象类型参数 response，该对象是最终响应对象的真子集。
+*	Event: '__dns__'
+	-	{ __address__ *string*, __family__ *number* }  
+		该事件携带一个解析地址结果对象。
+*	Event: '__connect__'
+*	Event: '__response__'  
+	-	__response__ *Object*  
+		该事件携带一个对象类型参数 response，该对象是最终响应对象的真子集。
 *	可读流对象默认支持的其他事件  
 	参见 [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable)。
 

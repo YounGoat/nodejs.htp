@@ -128,10 +128,12 @@ htp
 
 The return stream may emit following events:
 
-*	__dns__
-*	__connect__
-*	__response__  
-	Along with argument *response* which is a subset of the final response object.
+*	Event: '__dns__'
+	-	{ __address__ *string*, __family__ *number* }
+*	Event: '__connect__'
+*	Event: '__response__'  
+	-	__response__ *Object*  
+		Along with argument *response* which is a subset of the final response object.
 *	events which a readable stream may emit  
 	See [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable) for details.
 

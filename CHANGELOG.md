@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.4.2] - Jan 2, 2017
+
+*	On *piping* mode, pass *address* object to listener of event *dns*.
+
 ##	[0.4.1] - Jan 2, 2017
 
 ###	Fixed
