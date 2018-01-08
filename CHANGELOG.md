@@ -2,11 +2,19 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
-##	[0.4.2] - Jan 2, 2017
+##	[0.5.0] - Jan 8, 2018
+
+##	Fixed, IMPORTANT
+
+*	Fixed the bug that when invoking methods with payload (e.g. POST and PUT) of instanceof of __htp/SimpleAgent__, body of falsed value 0-length string will be ignored.
+*	Force the clientRequest to abort and the incommingMessage (response) to destroy on error ocurring.  
+	此前，当错误发生后，请求和响应可能并未终止，由此可能导致不可预知的问题。
+
+##	[0.4.2] - Jan 2, 2018
 
 *	On *piping* mode, pass *address* object to listener of event *dns*.
 
-##	[0.4.1] - Jan 2, 2017
+##	[0.4.1] - Jan 2, 2018
 
 ###	Fixed
 

@@ -188,7 +188,7 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
             args.push(headers);
         }
 
-        if (body) {
+        if (body !== null) {
             args.push(body);
         }
 

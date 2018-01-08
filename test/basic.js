@@ -214,12 +214,12 @@ describe('De-compress', () => {
 describe('Promise Returned', () => {
 	it('Resolve', (done) => {
 		let p = htp.request('HEAD', httpServer.genUrl('/'));
-		p.then((entity) => done());
+		p.then(entity => done());
 	});
 
 	it('Reject', (done) => {
 		let p = htp.request('GET', httpServer.genUrl('/timeout/chunk'));
-		p.catch((err) => { done(); });
+		p.catch(err => done());
 	});
 });
 
@@ -236,7 +236,7 @@ describe('Timeout Errors', () => {
 	var client = new htp({
 		"response_timeout": 100,
 		"chunk_timeout": 200,
-		"data_timeout": 1000
+		"data_timeout": 1000,
 	});
 
 	it('Timeout (response)', (done) => {
@@ -255,7 +255,7 @@ describe('Timeout Errors', () => {
 		});
 	});
 
-	it('Timeout (data)', (done) => {
+	it.only('Timeout (data)', (done) => {
 		client.request('GET', httpServer.genUrl('/timeout/data'), {}, (err, response) => {
 			assert(err instanceof ERRORS.TIMEOUT);
 			assert.equal('data', err.type);

@@ -44,7 +44,7 @@ describe('piping mode', function() {
 		});
 	});
 
-	it.only('events', (done) => {
+	it('events', (done) => {
 		let events = [];
 		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
 				assert.equal(3, events.length);

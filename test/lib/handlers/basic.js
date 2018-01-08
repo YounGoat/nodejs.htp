@@ -25,9 +25,10 @@ module.exports = function(req, res) {
 		case '/timeout/data':
 			// Response continues without being ended.
 			res.write('CHUNK');
-			setInterval(() => {
+			let h = setInterval(() => {
 				res.write('CHUNK\r\n');
 			}, 100);
+			setTimeout(() => h.clear(), 3000);
 			return;
 	}
 

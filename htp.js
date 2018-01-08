@@ -113,7 +113,7 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 				// Un-supported content encoding.
 		}
 	}
-
+	
 	// Read response body.
 	let chunks = [];
 	let onResponseArrived = once(() => {
@@ -135,9 +135,14 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 		bodyStream && bodyStream.push(chunk);
 	});
 
+	let aborted = false;
+	
+	// The "end" event will still be emitted after incommingMessage.destroy().
+	// Maybe we should forbid the listener to be invoked.
 	source.on('end', () => {
 		onResponseArrived();
 		onChunk();
+		timeout.end('CHUNK');
 		timeout.end('DATA');
 		bodyStream && bodyStream.end();
 
@@ -154,6 +159,11 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 
 		// In streaming mode, we wanna the 'end' event emitted and catched before callback() invoked.
 		bodyStream ? process.nextTick(callback, null, entity) : callback(null, entity);
+	});
+
+	// incommingMessage.destroy() leads to this event.
+	response.on('aborted', () => {
+		aborted = true;
 	});
 
 	response.on('error', (error) => {
@@ -178,7 +188,7 @@ const parseBody = function(buf, content) {
 // Base request executor.
 
 const baseRequest = function(method, urlname, headers, body, callback) {
-	let settings = defaultSettings, dnsAgent = DNS_AGENT;   
+	let settings = defaultSettings, dnsAgent = DNS_AGENT;
 	if (this instanceof easyRequest_constructor) {
 		settings = this.settings;
 		dnsAgent = this.dnsAgent;
@@ -224,10 +234,17 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 	let RR = (resolve, reject) => {
 		let timeout = new Timeout(settings);
+		let clientRequest = null;
+		let incomingMessage = null;
 
 		let fnDone = (err, entity) => {
 			timeout.clear();
+			
 			if (err) {
+				// Force the clientRequest to abort and the incomingMessage (response) to destroy.
+				clientRequest && clientRequest.abort();
+				incomingMessage && incomingMessage.destroy();
+
 				err.performance = timeout.performance;
 				err.action = method + ' ' + urlname;
 				emitOnBodyStream('error', err);
@@ -312,8 +329,11 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				remotePort    : null,
 			};
 
-			let clientRequest = (urlParts.protocol == 'https:' ? https : http)
-				.request(options, (response) => processResponse(settings, bodyStream, timeout, response, fnDone));
+			clientRequest = (urlParts.protocol == 'https:' ? https : http)
+				.request(options, response => {
+					incomingMessage = response;
+					processResponse(settings, bodyStream, timeout, response, fnDone);
+				});
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
