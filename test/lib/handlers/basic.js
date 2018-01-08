@@ -28,7 +28,7 @@ module.exports = function(req, res) {
 			let h = setInterval(() => {
 				res.write('CHUNK\r\n');
 			}, 100);
-			setTimeout(() => h.clear(), 3000);
+			setTimeout(() => clearInterval(h), 3000);
 			return;
 	}
 

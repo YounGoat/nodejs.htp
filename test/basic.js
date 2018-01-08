@@ -255,7 +255,7 @@ describe('Timeout Errors', () => {
 		});
 	});
 
-	it.only('Timeout (data)', (done) => {
+	it('Timeout (data)', (done) => {
 		client.request('GET', httpServer.genUrl('/timeout/data'), {}, (err, response) => {
 			assert(err instanceof ERRORS.TIMEOUT);
 			assert.equal('data', err.type);
