@@ -24,12 +24,12 @@
     },
     "homepage": "https://github.com/YounGoat/nodejs.htp#readme",
     "devDependencies": {
-        "ajv": "^5.1.5",
-        "mocha": "^3.4.1"
+        "ajv": "^5.5.1",
+        "mocha": "^4.1.0"
     },
     "dependencies": {
         "dns-agent": "^0.0.2",
-        "jinang": "^0.4.0",
+        "jinang": "^0.5.0",
         "overload2": "^0.2.1"
     },
     "engines": {
