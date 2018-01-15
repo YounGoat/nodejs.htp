@@ -2,6 +2,13 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.5.1] - Jan 16, 2018
+
+##	Changed, RISKY
+
+*	In this version, hostname in the URL will be replaced with IP address returned by __dns-agent__ before being passed to `http.request()` or `https.request()` to avoid repetitive DNS requests for resolving the same hostname.  
+	在这个版本中，我们用 __dns-agent__ 返回的 IP 地址替换 URL 中的主机名，然后才将其传递至 `http.request()` 或 `https.request()` 方法。__dns-agent__ 本身具备可靠的及可调节的缓存功能，如果针对同一主机名的 URL 地址，发生高并发调用或短时间内的大量调用，这一作法可以有效避免系统重复发起 DNS 解析。
+
 ##	[0.5.0] - Jan 8, 2018
 
 ##	Fixed, IMPORTANT

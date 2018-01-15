@@ -26,6 +26,18 @@ const MODULE_REQUIRE = 1
 	, ERRORS = require('./ERRORS')
 	, defaultSettings = require('./settings')
 	, METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
+
+	/* in-file */
+	, setHeaderIfUndefined = (headers, name, value) => {
+		let name_lc = name.toLowerCase();
+		let found = false;
+		for (let key in headers) {
+			found = (key.toLowerCase() == name_lc);
+			if (found) break;
+		}
+		if (!found) headers[name] = value;
+		return found;
+	}
 	;
 
 // ---------------------------
@@ -301,19 +313,26 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 			if (err) {
 				return fnDone(err);
-			}
+			}			
 
+			if (address != urlParts.hostname) {
+				setHeaderIfUndefined(headers, 'Host', urlParts.hostname);
+			}
+			
 			const options = {
 				protocol : urlParts.protocol,
 				auth     : urlParts.auth,
-				hostname : urlParts.hostname,
+				
+				// hostname : urlParts.hostname,
+				hostname : address,
+
 				port     : urlParts.port,
 				path     : urlParts.path,
 
 				method   : method,
 				headers  : headers
 			};
-
+			
 			if (urlParts.protocol == 'https:') {
 				// @see https://nodejs.org/dist/latest/docs/api/tls.html#tls_tls_connect_options_callback
 				Object.assign(options, object2.clone(settings, [ 'rejectUnauthorized' ]));
