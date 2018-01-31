@@ -216,6 +216,8 @@ p.then(function(bodyBuffer) {
 
 *	*Function* __beforeRequest__({ method, url, headers, body, callback })  
 	该方法将在发起 HTTP 请求前被调用，传入的对象包含 5 个属性。该方法 __应当__ 返回 `void` 或是由上述全部或部分属性组成的对象，这些返回的属性将被应用于即将发起的 HTTP 请求。
+*	*Function* __beforeCallback__(error, data)  
+	该方法将在调用回调函数之前被调用，其他返回值将作为回调数据传给 `callback(null, data)` or `resolve(data)`。
 *	*string* __endPoint__  
 *	*object* __headers__
 *	*object* __query__

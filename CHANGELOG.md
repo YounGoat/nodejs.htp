@@ -2,6 +2,12 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.6.0] - Feb 1st, 2018
+
+###	New
+
+*	Property `beforeCallback` added to `options` argument in `new SimpleAgent(options)`.
+
 ##	[0.5.1] - Jan 16, 2018
 
 ##	Changed, RISKY

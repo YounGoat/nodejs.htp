@@ -158,28 +158,19 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
 
     // ---------------------------
 
-    // let RR = (resolve, reject) => {
-    //     let done = (err, body, headers) => {
-    //         err ? reject && reject(err) : resolve && resolve(body, headers);
-	// 		callback && callback(err, body, headers);
-    //     };
+    let agentCallback = callback, beforeCallback = this.options.beforecallback;
+    if (callback && beforeCallback) {
+        agentCallback = (err, response) => {
+            try {
+                let ret = beforeCallback(err, response);
+                callback(null, ret);
+            } catch(ex) {
+                callback(ex);
+            }
+        };
+    }
 
-    //     let args = [ method, urlname ];
-        
-    //     if (this.options.headers || headers) {
-    //         headers = Object.assign({}, headers, this.options.headers);
-    //         args.push(headers);
-    //     }
-
-    //     if (body) {
-    //         args.push(body);
-    //     }
-
-    //     args.push(done);
-    //     this.htp.apply(this.htp, args);
-    // };
-    // return callback ? RR() : new Promise(RR);
-
+    let ret = null;
     if (1) {
         let args = [ method, urlname ];
         
@@ -192,12 +183,24 @@ SimpleAgent.prototype.request = function(method, urlname, headers, body, callbac
             args.push(body);
         }
 
-        if (callback) {
-            args.push(callback);
+        if (agentCallback) {
+            args.push(agentCallback);
         }
 
-        return this.htp.request.apply(this.htp, args);
+        ret = this.htp.request.apply(this.htp, args);
     }
+
+    if (ret instanceof Promise && beforeCallback) {
+        ret = ret
+            .then(response => {
+                return beforeCallback(null, response);
+            })
+            .catch(err => {
+                beforeCallback(err);
+            });
+    }
+
+    return ret;
 };
 
 // According HTTP methods' names, add homonymous method to the prototype.

@@ -217,6 +217,8 @@ Acceptable options accepted by __htp/SimpleAgent__ are:
 
 *	*Function* __beforeRequest__({ method, url, headers, body, callback })  
 	If offered, this function will be invoked with an object passed in before real HTTP request starts. The passed in object is made up five properties. The function SHOULD return void or an object made up all or some of the properties. If an object returned, the properties will be used on requesting.
+*	*Function* __beforeCallback__(error, data)  
+	If offered, this function will be invoked before callback invoked. The returned value will be used as real data and passed to `callback(null, data)` or `resolve(data)`.
 *	*string* __endPoint__  
 *	*object* __headers__
 *	*object* __query__
