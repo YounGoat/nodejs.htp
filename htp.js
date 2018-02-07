@@ -257,8 +257,12 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				clientRequest && clientRequest.abort();
 				incomingMessage && incomingMessage.destroy();
 
+				if (!(err instanceof Error)) {
+					err = new Error(err);
+				}
 				err.performance = timeout.performance;
 				err.action = method + ' ' + urlname;
+
 				emitOnBodyStream('error', err);
 				reject && reject(err);
 				callback && callback(err, null);
@@ -393,6 +397,10 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				clientRequest.end(body);
 			}
 			else if (body instanceof stream.Readable) {
+				body.on('error', function(err) {
+					// 如果输入流出现错误，将该错误传递至请求流。
+					clientRequest.emit('error', err);
+				});
 				body.pipe(clientRequest);
 			}
 		};

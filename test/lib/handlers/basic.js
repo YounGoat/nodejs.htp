@@ -61,8 +61,6 @@ module.exports = function(req, res) {
 		doResponse(req.method);
 	}
 	else {
-		// console.log('SERVER REQ', req.headers);
-
 		let source = req;
 		if (req.headers['content-encoding']) {
 			switch (req.headers['content-encoding'].toLowerCase()) {

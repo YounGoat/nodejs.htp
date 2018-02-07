@@ -3,6 +3,7 @@
 const MODULE_REQUIRE = 1
 	/* built-in */
 	, assert = require('assert')
+	, stream = require('stream')
 	/* NPM */
 	, ajv = require('ajv')
 	/* in-package */
@@ -17,7 +18,7 @@ const MODULE_REQUIRE = 1
 // 响应对象是一个简单对象，本方法用于检查其结构是否符合预期。
 let validateResponse = (new ajv).compile(schema);
 
-let httpServer = new HttpServer('piping');
+let httpServer = new HttpServer('streaming');
 
 before((done) => {
     httpServer.start(done);
@@ -53,7 +54,6 @@ describe('piping mode', function() {
 			;
 
 		output
-			.on('error', (e) => console.log('error', e))
 			.on('dns', (info) => {
 				assert(info.address);
 				assert(info.family);
@@ -61,7 +61,6 @@ describe('piping mode', function() {
 			})
 			.on('connect', () => events.push('connect'))
 			.on('response', (response) => { 
-				// console.log(response.statusCode); 
 				events.push('response');
 			})
 			;
@@ -73,5 +72,20 @@ describe('piping mode', function() {
 			done();
 		})
 		;
+	});
+});
+
+describe('streaming stource', () => {
+	it('catch source stream error', (done) => {
+		let E = new Error('.');
+		let t = new stream.Transform();
+		t._transform = function(chunk, encoding, callback) {
+			callback(null, chunk);
+		};
+		htp.put(httpServer.genUrl('/'), t, (err, response) => {
+			assert.strictEqual(E, err);
+			done();
+		});
+		setTimeout(() => t.emit('error', E), 100);
 	});
 });

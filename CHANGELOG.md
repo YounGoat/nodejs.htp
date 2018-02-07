@@ -2,6 +2,12 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.6.1] - Feb 7th, 2018
+
+### Changed, RISKY
+
+*	When instance of `stream.Readable` used as HTTP body, errors on the stream will be caught and the request action will be ceased forcely.
+
 ##	[0.6.0] - Feb 1st, 2018
 
 ###	New
