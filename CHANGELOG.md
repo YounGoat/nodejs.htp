@@ -2,7 +2,13 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
-##	[0.6.1] - Feb 7th, 2018
+##	[0.7.0] - Mar 23rd, 2018 - RISKY
+
+*	`http.request()` or `https.request()` is wrapped with `try ... catch ...`.
+*	Standlone instances of `http.Agent` and `https.Agent` are used in replacement of `http.globalAgent` and `https.globalAgent`.
+*	Default setting `dns_ttl` is changed to *60* (in seconds) from *600000* (in milli-seconds). And the unit of __options.dns_ttl__ is changed to seconds.
+
+##	[0.6.1] - Feb 7th, 2018 - RISKY
 
 ### Changed, RISKY
 

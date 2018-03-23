@@ -1,4 +1,4 @@
-// Unit: milli-second
+// Default unit: milli-second
 module.exports = {
 
 	// Whether to return the response stream 
@@ -23,7 +23,8 @@ module.exports = {
 	"dns_timeout"      :   5000,
 
 	// DNS TTL.
-	"dns_ttl"          : 600000,
+	// Unit: seconds
+	"dns_ttl"          :     60,
 
 	// Time used to plug into socket.
 	// http(s).request() -- "socket" event

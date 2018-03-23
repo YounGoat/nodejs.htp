@@ -170,7 +170,10 @@ Here are options available when creating a customized user agent:
 	Max time to finish the whole request.  
 
 *	__options.dns_timeout__ *number* (unit: ms)  
-	Max time to resolve hostname.  
+	Max time to resolve hostname.
+
+*	__options.dns_ttl__ *number* (unit: seconds)  
+	Time-to-live of DNS resolving result.
 
 *	__options.plugin_timeout__ *number* (unit: ms)  
 	Max time to plug into socket.

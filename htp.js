@@ -41,7 +41,7 @@ const MODULE_REQUIRE = 1
 	;
 
 // ---------------------------
-// Datatypes
+// Datatypes.
 
 const HTTP_METHOD = Type.enum.apply(overload2, http.METHODS);
 
@@ -62,7 +62,13 @@ const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL', 'UND
 
 const CALLBACK = Function;
 
+// ---------------------------
+// Global constants.
+
 const DNS_AGENT = new DnsAgent({ ttl: defaultSettings.dns_ttl, source: 'system' });
+
+const HTTP_AGENT = new http.Agent({ keepAlive: false });
+const HTTPS_AGENT = new https.Agent({ keepAlive: false });
 
 // ---------------------------
 // Response processor.
@@ -334,7 +340,9 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				path     : urlParts.path,
 
 				method   : method,
-				headers  : headers
+				headers  : headers,
+
+				agent    : (urlParts.protocol == 'https:') ? HTTPS_AGENT : HTTP_AGENT,
 			};
 			
 			if (urlParts.protocol == 'https:') {
@@ -352,17 +360,26 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				remotePort    : null,
 			};
 
-			clientRequest = (urlParts.protocol == 'https:' ? https : http)
-				.request(options, response => {
-					incomingMessage = response;
-					processResponse(settings, bodyStream, timeout, response, fnDone);
-				});
+			try {
+				clientRequest = (urlParts.protocol == 'https:' ? https : http)
+					.request(options, response => {
+						incomingMessage = response;
+						processResponse(settings, bodyStream, timeout, response, fnDone);
+					});
+			} 
+			catch(ex) {
+				return fnDone(ex);
+			}
 
 			timeout.start('PLUGIN', fnDone);
 			clientRequest.on('socket', function(socket) {
 				timeout.end('PLUGIN');
 				timeout.start('CONNECT', fnDone);
-				socket.on('connect', function(event) {
+
+				// If keepAlive enabled, socket may be reused.
+				// socket.setMaxListeners(100);
+				// socket.on('connect', function(event) {
+				socket.once('connect', function(event) {
 					timeout.end('CONNECT');
 					emitOnBodyStream('connect');
 					
