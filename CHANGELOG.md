@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.7.1] - April 1st, 2018
+
+*	Fixed the bug that on response with unsupported charset, an unhandled exception will be thrown.
+
 ##	[0.7.0] - Mar 23rd, 2018 - RISKY
 
 *	`http.request()` or `https.request()` is wrapped with `try ... catch ...`.

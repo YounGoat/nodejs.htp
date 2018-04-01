@@ -44,4 +44,7 @@ module.exports = {
 	// Time used to receive all data.
 	// "connect" event -- "end" event (all data chunks arrive)
 	"data_timeout"     :  60000,
+
+	// Whether HTTP/HTTPS agent will keep alive for more requests.
+	"keepAlive"        : false,
 };

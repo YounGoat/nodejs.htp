@@ -10,9 +10,16 @@ __Maybe the easiest but still strong http client you have ever meet.__
 [![build status of github.com/YounGoat/nodejs.htp](https://travis-ci.org/YounGoat/nodejs.htp.svg?branch=master)](https://travis-ci.org/YounGoat/nodejs.htp)
 [![star github.com/YounGoat/nodejs.htp](https://img.shields.io/github/stars/YounGoat/nodejs.htp.svg?style=social&label=Star)](https://github.com/YounGoat/nodejs.htp/stargazers)
 
-Languages / [简体中文](./README.zh_CN.md)
+>	Languages / [简体中文](./README.zh_CN.md)  
+>	If links in this document not avaiable, please access [README on GitHub](./README.md) directly.
 
-##	Table of contents
+##	Description
+
+Another choice for you to finish HTTP or HTTPS request.
+
+![htp.logo](./docs/htp.logo.png)
+
+##	ToC
 
 *	[Get Started](#get-started)
 *	[API](#api)
@@ -25,9 +32,6 @@ Languages / [简体中文](./README.zh_CN.md)
 *	[Honorable Dependents](#honorable-dependents)
 *	[About](#about)
 *	[References](#references)
-
-##	Links
-
 *	[CHANGE LOG](./CHANGELOG.md)
 *	[Homepage](https://github.com/YounGoat/nodejs.htp)
 
@@ -74,6 +78,19 @@ client.request('GET', 'http://www.example.com/', function(err, response) {
 ```
 
 ##	API
+
+###	The Response Object
+
+If request achieved successfully, a Response object will be passed. The Response object SHOULD contain the following properties:
+
+*	__response.statusCode__ *number*
+*	__response.statusMessage__ *string*
+*	__response.httpVersion__ *string*
+*	__response.headers__ *Object*
+*	__response.body__ *string* | *Object(json)* | *null*  
+*	__response.bodyBuffer__ *Buffer* | *null*
+*	__response.bodyDecompressed__ 
+*	__response.performance__ *Object*
 
 ###	Basic API
 

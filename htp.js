@@ -13,6 +13,7 @@ const MODULE_REQUIRE = 1
 
 	/* NPM */
 	, overload2 = require('overload2')
+	, if2 = require('if2')
 	, DnsAgent = require('dns-agent')
 	, Type = overload2.Type
 
@@ -26,6 +27,7 @@ const MODULE_REQUIRE = 1
 	, ERRORS = require('./ERRORS')
 	, defaultSettings = require('./settings')
 	, METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
+	, CHARSETS = require('./charsets')
 
 	/* in-file */
 	, setHeaderIfUndefined = (headers, name, value) => {
@@ -66,7 +68,6 @@ const CALLBACK = Function;
 // Global constants.
 
 const DNS_AGENT = new DnsAgent({ ttl: defaultSettings.dns_ttl, source: 'system' });
-
 const HTTP_AGENT = new http.Agent({ keepAlive: false });
 const HTTPS_AGENT = new https.Agent({ keepAlive: false });
 
@@ -191,6 +192,9 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 };
 
 const parseBody = function(buf, content) {
+	// If charset unsupported, return null without parsing.
+	if (!CHARSETS.includes(content.charset.toLowerCase())) return null;
+	
 	let body = buf.toString(content.charset);
 	if (content.type === 'application/json') {
 		try {
@@ -206,12 +210,20 @@ const parseBody = function(buf, content) {
 // Base request executor.
 
 const baseRequest = function(method, urlname, headers, body, callback) {
-	let settings = defaultSettings, dnsAgent = DNS_AGENT;
-	if (this instanceof easyRequest_constructor) {
-		settings = this.settings;
-		dnsAgent = this.dnsAgent;
-	}
+	let foo
+		, settings   = defaultSettings
+		, dnsAgent   = DNS_AGENT
+		, httpAgent  = HTTP_AGENT
+		, httpsAgent = HTTPS_AGENT
+		;
 
+	if (this instanceof easyRequest_constructor) {
+		settings   = this.settings;
+		dnsAgent   = if2(this.dnsAgent  , dnsAgent  );
+		httpAgent  = if2(this.httpAgent , httpAgent );
+		httpsAgent = if2(this.httpsAgent, httpsAgent);
+	}
+	
 	let bodyStream = null;
 	if (settings.piping) {
 		bodyStream = new Receiver();
@@ -342,7 +354,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				method   : method,
 				headers  : headers,
 
-				agent    : (urlParts.protocol == 'https:') ? HTTPS_AGENT : HTTP_AGENT,
+				agent    : (urlParts.protocol == 'https:') ? httpsAgent : httpAgent,
 			};
 			
 			if (urlParts.protocol == 'https:') {
@@ -443,14 +455,16 @@ function easyRequest_constructor(settings) {
 		return new easyRequest_constructor(settings);
 	}
 
-	this.settings = Object.assign({}, defaultSettings, settings);
-	if (this.settings.dns_ttl == defaultSettings.dns_ttl) {
-		this.dnsAgent = DNS_AGENT;
+	if (settings.dns_ttl != defaultSettings.dns_ttl) {
+		this.dnsAgent = new DnsAgent({ ttl: settings.dns_ttl });
 	}
-	else {
-		this.dnsAgent = new DnsAgent({ ttl: this.settings.dns_ttl });
+	
+	if (settings.keepAlive != defaultSettings.keepAlive) {
+		this.httpAgent = new http.Agent({ keepAlive: false });
+		this.httpsAgent = new https.Agent({ keepAlive: false });
 	}
 
+	this.settings = Object.assign({}, defaultSettings, settings);
 	this.request = easyRequest;
 
 	http.METHODS.forEach((name) => {
