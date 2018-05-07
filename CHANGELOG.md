@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.8.0] - Apr 24th, 2018
+
+*	Default [settings](./settings.js) changed on `response.timeout` and `data.timeout`.
+
 ##	[0.7.1] - April 1st, 2018
 
 *	Fixed the bug that on response with unsupported charset, an unhandled exception will be thrown.

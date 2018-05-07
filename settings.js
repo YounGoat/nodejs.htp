@@ -36,14 +36,14 @@ module.exports = {
 
 	// Time used to recieve the first response from target server.
 	// "connect" event -- first "data" event (first data chunk arrives)
-	"response_timeout" :  15000,
+	"response_timeout" :  60000,
 
 	// Time between two data chunks.
 	"chunk_timeout"    :   5000,
 
 	// Time used to receive all data.
 	// "connect" event -- "end" event (all data chunks arrive)
-	"data_timeout"     :  60000,
+	"data_timeout"     :  90000,
 
 	// Whether HTTP/HTTPS agent will keep alive for more requests.
 	"keepAlive"        : false,
