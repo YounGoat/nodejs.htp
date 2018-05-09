@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.8.1] - May 9th, 2018
+
+*	Fixed the bug that dependencies missed.
+
 ##	[0.8.0] - Apr 24th, 2018
 
 *	Default [settings](./settings.js) changed on `response.timeout` and `data.timeout`.
