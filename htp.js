@@ -113,7 +113,7 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 			content[RegExp.$1] = RegExp.$2;
 		}
 	}
-
+	
 	let source = response, decompressed = false;
 	if (headers['content-encoding']) {
 		switch (headers['content-encoding'].toLowerCase()) {
@@ -185,10 +185,13 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 		aborted = true;
 	});
 
-	response.on('error', (error) => {
+	let onError = (error) => {
 		bodyStream && bodyStream.emit('error', error);
 		callback(error);
-	});
+	};
+
+	source.on('error', onError);
+	if (source !== response) response.on('error', onError);
 };
 
 const parseBody = function(buf, content) {
@@ -235,6 +238,10 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 	if (!headers) {
 		headers = {};
+	}
+	
+	for (let name in headers) {
+		if (typeof headers[name] == 'undefined') delete headers[name];
 	}
 
 	// Each header field consists of a name followed by a colon (":") and the field value. Field names are case-insensitive.

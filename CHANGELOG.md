@@ -2,6 +2,14 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.8.3] - June 5th, 2018
+
+*	Delete items with undefined value from `headers`. Otherwise, an Error will be thrown when http/https try to setHeader with undefined value.
+
+##	[0.8.2] - May 10th, 2018
+
+*	Catch error on processing response encoded via gzip/deflate.
+
 ##	[0.8.1] - May 9th, 2018
 
 *	Fixed the bug that dependencies missed.
