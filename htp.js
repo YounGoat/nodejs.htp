@@ -27,7 +27,7 @@ const MODULE_REQUIRE = 1
 	, ERRORS = require('./ERRORS')
 	, defaultSettings = require('./settings')
 	, METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
-	, CHARSETS = require('./charsets')
+	, charsets = require('./charsets')
 
 	/* in-file */
 	, setHeaderIfUndefined = (headers, name, value) => {
@@ -60,7 +60,7 @@ const URL = 'string';
 
 const HEADERS = ['object', 'NULL', 'UNDEFINED'];
 
-const BODY = [Type.or('string', 'object', Buffer, stream.Readable), 'NULL', 'UNDEFINED'];
+const BODY = [Type.or('string', 'object', Buffer, stream), 'NULL', 'UNDEFINED'];
 
 const CALLBACK = Function;
 
@@ -195,10 +195,11 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 };
 
 const parseBody = function(buf, content) {
-	// If charset unsupported, return null without parsing.
-	if (!CHARSETS.includes(content.charset.toLowerCase())) return null;
+	// If charset unsupported, return null without parsing.	
+	let charset = charsets(content.charset);
+	if (!charset) return null;
 	
-	let body = buf.toString(content.charset);
+	let body = buf.toString(charset);
 	if (content.type === 'application/json') {
 		try {
 			body = JSON.parse(body);
@@ -432,7 +433,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 			else if (typeof body === 'string' || body instanceof Buffer) {
 				clientRequest.end(body);
 			}
-			else if (body instanceof stream.Readable) {
+			else if (body instanceof stream) {
 				body.on('error', function(err) {
 					// 如果输入流出现错误，将该错误传递至请求流。
 					clientRequest.emit('error', err);

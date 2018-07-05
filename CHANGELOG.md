@@ -2,8 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
-##	[0.8.3] - June 5th, 2018
+##	[0.9.0] - June 19th, 2018
 
+*	Accept all instance of `stream` rather than only those of `stream.Readable` as body.
+*	Support charset 'ISO-8859-1' on parsing response body.
 *	Delete items with undefined value from `headers`. Otherwise, an Error will be thrown when http/https try to setHeader with undefined value.
 
 ##	[0.8.2] - May 10th, 2018

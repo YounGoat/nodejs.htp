@@ -2,7 +2,8 @@
  * SEE
  *   https://nodejs.org/docs/latest/api/buffer.html#buffer_buffers_and_character_encodings
  */
-module.exports = [
+
+const CHARSETS = [
 	'ascii'  , // For 7-bit ASCII data only. This encoding is fast and will strip the high bit if set.
 	'utf8'   , // Multibyte encoded Unicode characters. Many web pages and other document formats use UTF-8.
 	'utf-8'  ,
@@ -13,3 +14,20 @@ module.exports = [
 	'binary' , // Alias for 'latin1'.
 	'hex'    , // Encode each byte as two hexadecimal characters.
 ];
+
+const ALIAS = {
+	'iso-8859-1': 'latin1',
+};
+
+module.exports = function(charset) {
+	charset = charset.toLowerCase();
+	if (ALIAS[charset]) {
+		return ALIAS[charset];
+	}
+	else if (CHARSETS.includes(charset)) {
+		return charset;
+	}
+	else {
+		return null;
+	}
+};
