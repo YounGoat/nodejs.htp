@@ -67,9 +67,16 @@ const CALLBACK = Function;
 // ---------------------------
 // Global constants.
 
-const DNS_AGENT = new DnsAgent({ ttl: defaultSettings.dns_ttl, source: 'system' });
-const HTTP_AGENT = new http.Agent({ keepAlive: false });
-const HTTPS_AGENT = new https.Agent({ keepAlive: false });
+const DNS_AGENT = new DnsAgent({ 
+	ttl: defaultSettings.dns_ttl, 
+	source: 'system',
+});
+const HTTP_AGENT = new http.Agent({ 
+	keepAlive: defaultSettings.keepAlive,
+});
+const HTTPS_AGENT = new https.Agent({ 
+	keepAlive: defaultSettings.keepAlive,
+});
 
 // ---------------------------
 // Response processor.
@@ -399,14 +406,18 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				// If keepAlive enabled, socket may be reused.
 				// socket.setMaxListeners(100);
 				// socket.on('connect', function(event) {
-				socket.once('connect', function(event) {
+
+				let onConnect = function(event) {
 					timeout.end('CONNECT');
 					emitOnBodyStream('connect');
 					
 					timeout.start('RESPONSE', fnDone);
 					timeout.start('DATA', fnDone);
 					Object.assign(connection, object2.clone(socket, [ /^remote/, /^local/ ]));
-				});
+				};
+
+				// If socket is already connected, when it is reused, run the callback function directly.
+				socket.connecting ? socket.once('connect', onConnect) : onConnect();
 			});
 
 			// 仅面向 HTTP CONNECT 方法，是一种特殊的 HTTP 响应，与 socket 建联无关。
@@ -468,8 +479,8 @@ function easyRequest_constructor(settings) {
 	}
 	
 	if (settings.keepAlive != defaultSettings.keepAlive) {
-		this.httpAgent = new http.Agent({ keepAlive: false });
-		this.httpsAgent = new https.Agent({ keepAlive: false });
+		this.httpAgent  = new http.Agent ({ keepAlive: settings.keepAlive });
+		this.httpsAgent = new https.Agent({ keepAlive: settings.keepAlive });
 	}
 
 	this.settings = Object.assign({}, defaultSettings, settings);

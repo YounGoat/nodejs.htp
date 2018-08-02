@@ -2,6 +2,24 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.10.0] - Aug 1st, 2018
+
+*	Fixed the bug that when `performance` data sometimes incomplete when passed-in agent enables `keepAlive` option:
+	```javascript
+	// Event `connect` will be not triggered when `socket` is re-used and already connected.
+	socket.once('connect', function() {
+		timeout.end('CONNECT');
+		emitOnBodyStream('connect');
+		
+		timeout.start('RESPONSE', fnDone);
+		timeout.start('DATA', fnDone);
+		Object.assign(connection, object2.clone(socket, [ /^remote/, /^local/ ]));
+	});
+	```
+
+*	Fixed the bug that customised settings `keepAlive` not effective.
+*	Change default settings `keepAlive` to `true`.
+
 ##	[0.9.0] - June 19th, 2018
 
 *	Accept all instance of `stream` rather than only those of `stream.Readable` as body.

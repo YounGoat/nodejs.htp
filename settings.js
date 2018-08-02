@@ -46,5 +46,5 @@ module.exports = {
 	"data_timeout"     :  90000,
 
 	// Whether HTTP/HTTPS agent will keep alive for more requests.
-	"keepAlive"        : false,
+	"keepAlive"        :  true,
 };
