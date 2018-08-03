@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.10.1] - Aug 3rd, 2018
+
+*	Fixed the bug that the package depends on itself.
+
 ##	[0.10.0] - Aug 1st, 2018
 
 *	Fixed the bug that when `performance` data sometimes incomplete when passed-in agent enables `keepAlive` option:

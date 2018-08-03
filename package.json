@@ -1,6 +1,6 @@
 {
     "name": "htp",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "Easy http/https client",
     "main": "htp.js",
     "directories": {
@@ -29,7 +29,6 @@
     },
     "dependencies": {
         "dns-agent": "^0.1.1",
-        "htp": "^0.8.0",
         "if2": "^0.2.0",
         "jinang": "^0.21.0",
         "overload2": "^0.3.1"
