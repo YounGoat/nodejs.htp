@@ -508,11 +508,11 @@ const easyRequest = overload2()
 		function(method, urlname, headers, body, callback) { return baseRequest.call(this, method, urlname, headers, body, callback); }
 	)
 
-	// Methods requiring payloads.
-
-	.overload(HTTP_METHOD_PAYLOAD, URL, HEADERS, BODY,
+	.overload(HTTP_METHOD, URL, HEADERS, BODY,
 		function(method, urlname, headers, body) { return baseRequest.call(this, method, urlname, headers, body, null); }
 	)
+
+	// Methods requiring payloads.
 
 	.overload(HTTP_METHOD_PAYLOAD, URL, BODY, CALLBACK,
 		function(method, urlname, body, callback) { return baseRequest.call(this, method, urlname, null, body, callback); }

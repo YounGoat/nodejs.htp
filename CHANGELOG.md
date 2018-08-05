@@ -2,6 +2,16 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.10.2] - Aug 5th, 2018
+
+*	Add mothod __COPY__ to the `method-without-payload` list.
+*	Allow all methods to request with payload as long as no arguments omitted. E.g.
+	```javascript
+	// An OVERLOAD2.UnmatchingException will be thrown before.
+	// However, no exception thrown now.
+	htp.delete('http://example.com/source.html', null, { Backup: '/target.html' });
+	```
+
 ##	[0.10.1] - Aug 3rd, 2018
 
 *	Fixed the bug that the package depends on itself.

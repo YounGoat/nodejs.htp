@@ -18,7 +18,7 @@ let validateResponse = (new ajv).compile(schema);
 
 describe('HTTPS', () => {
 	it('GET', (done) => {
-		htp.get('https://wwww.baidu.com', (err, res) => {
+		htp.get('https://www.baidu.com', (err, res) => {
 			assert.equal(null, err);
 			assert(res);
 			done();
