@@ -2,6 +2,11 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.10.3] - Aug 7th, 2018
+
+*	An instance of DnsAgent may be passed in via `htp({ dnsAgent })` to create a customised http user agent.
+*	Fixed the bug that dnsAgent and http(s)Agent unnecessarily created when no special settings property passed in.
+
 ##	[0.10.2] - Aug 5th, 2018
 
 *	Add mothod __COPY__ to the `method-without-payload` list.

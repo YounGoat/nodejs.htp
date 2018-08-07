@@ -192,6 +192,9 @@ Here are options available when creating a customized user agent:
 *	__options.dns_ttl__ *number* (unit: seconds)  
 	Time-to-live of DNS resolving result.
 
+*	__options.dnsAgent__ *dns-agent*  
+	An instance of [dns-agent](https://www.npmjs.com/package/dns-agent).
+
 *	__options.plugin_timeout__ *number* (unit: ms)  
 	Max time to plug into socket.
 

@@ -474,13 +474,28 @@ function easyRequest_constructor(settings) {
 		return new easyRequest_constructor(settings);
 	}
 
-	if (settings.dns_ttl != defaultSettings.dns_ttl) {
+	let defined = name => settings && settings.hasOwnProperty(name);
+	let diff = name => settings && settings.hasOwnProperty(name) && settings[name] != defaultSettings[name];
+
+	if (defined('dnsAgent')) {
+		this.dnsAgent = settings.dnsAgent;
+	}
+	else if (diff('dns_ttl')) {
 		this.dnsAgent = new DnsAgent({ ttl: settings.dns_ttl });
 	}
 	
-	if (settings.keepAlive != defaultSettings.keepAlive) {
+	if (defined('httpAgent')) {
+		this.httpAgent = settings.httpAgent;
+	}
+	else if (diff('keepAlive')) {
 		this.httpAgent  = new http.Agent ({ keepAlive: settings.keepAlive });
-		this.httpsAgent = new https.Agent({ keepAlive: settings.keepAlive });
+	}
+
+	if (defined('httpsAgent')) {
+		this.httpsAgent = settings.httpsAgent;
+	}
+	else if (diff('keepAlive')) {
+		this.httpsAgent  = new https.Agent ({ keepAlive: settings.keepAlive });
 	}
 
 	this.settings = Object.assign({}, defaultSettings, settings);
