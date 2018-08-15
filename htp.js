@@ -60,7 +60,7 @@ const URL = 'string';
 
 const HEADERS = ['object', 'NULL', 'UNDEFINED'];
 
-const BODY = [Type.or('string', 'object', Buffer, stream), 'NULL', 'UNDEFINED'];
+const BODY = [Type.or('string', 'object', Array, Buffer, stream), 'NULL', 'UNDEFINED'];
 
 const CALLBACK = Function;
 
@@ -266,7 +266,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		headers['accept-encoding'] = 'gzip, deflate';
 	}
 
-	if (body != null && typeof body == 'object' && body.constructor === Object) {
+	if (body instanceof Array || (body != null && typeof body == 'object' && body.constructor === Object)) {
 		body = JSON.stringify(body);
 		if (util.isUndefined(headers['content-type'])) {
 			headers['content-type'] = 'application/json';

@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.10.4] - Aug 16th, 2018
+
+*	Accept instance of `Array` as BODY.
+
 ##	[0.10.3] - Aug 7th, 2018
 
 *	An instance of DnsAgent may be passed in via `htp({ dnsAgent })` to create a customised http user agent.
