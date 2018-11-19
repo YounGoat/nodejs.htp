@@ -2,12 +2,9 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
-##	[0.11.1] - Nov 19th, 2018
+##	[0.11.0] - Nov 19th, 2018
 
 *	Fixed the bug trying gunzip a HEAD response.
-
-##	[0.11.0] - Oct 30th, 2018
-
 *	Response object property `network` added.
 
 ##	[0.10.4] - Aug 16th, 2018
