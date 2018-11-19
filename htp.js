@@ -81,15 +81,22 @@ const HTTPS_AGENT = new https.Agent({
 // ---------------------------
 // Response processor.
 
-const processResponse = function(settings, bodyStream, timeout, response, callback) {	
-	let entity =
-		{ statusCode: response.statusCode
-		, statusMessage: response.statusMessage
-		, httpVersion: response.httpVersion
-		, headers: response.headers
-		// , body: null
-		// , bodyDecompressed: false
-		// , bodyBuffer: null
+const processResponse = function(method, settings, bodyStream, timeout, response, callback) {	
+	let entity = { 
+		statusCode    : response.statusCode,
+		statusMessage : response.statusMessage,
+		httpVersion   : response.httpVersion,
+		headers       : response.headers,
+		network       : {
+			remoteAddress : response.socket.remoteAddress,
+			remoteFamily  : response.socket.remoteFamily,
+			remotePort    : response.socket.remotePort,
+			localAddress  : response.socket.localAddress,
+			localPort     : response.socket.localPort,
+		},
+		// body: null,
+		// bodyDecompressed: false,
+		// bodyBuffer: null,
 		};
 
 	let content =
@@ -109,6 +116,7 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 	}
 	
 	if (headers['content-length']) {
+		// @todo The content length may be changed after being doecoded.
 		content.length = 0 + headers['content-length'];
 	}
 
@@ -122,7 +130,7 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 	}
 	
 	let source = response, decompressed = false;
-	if (headers['content-encoding']) {
+	if (headers['content-encoding'] && method != 'HEAD') {
 		switch (headers['content-encoding'].toLowerCase()) {
 			case 'gzip':
 				source = response.pipe(zlib.createGunzip());
@@ -202,18 +210,25 @@ const processResponse = function(settings, bodyStream, timeout, response, callba
 };
 
 const parseBody = function(buf, content) {
+	let body = null;
+
 	// If charset unsupported, return null without parsing.	
 	let charset = charsets(content.charset);
-	if (!charset) return null;
-	
-	let body = buf.toString(charset);
-	if (content.type === 'application/json') {
+	if (charset) {
+		body = buf.toString(charset);		
+	}
+	else {
+		// DO NOTHING.
+	}
+
+	if (body && content.type === 'application/json') {
 		try {
 			body = JSON.parse(body);
 		} catch(ex) {
 			// DO NOTHING.
 		}
 	}
+
 	return body;
 };
 
@@ -391,7 +406,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				clientRequest = (urlParts.protocol == 'https:' ? https : http)
 					.request(options, response => {
 						incomingMessage = response;
-						processResponse(settings, bodyStream, timeout, response, fnDone);
+						processResponse(method, settings, bodyStream, timeout, response, fnDone);
 					});
 			} 
 			catch(ex) {
