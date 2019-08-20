@@ -1,0 +1,49 @@
+{
+	"title": "htp response",
+	"type": "object",
+	"properties": {
+		"statusCode": {
+			"type": "number"
+		},
+		"statusMessage": {
+			"type": "string"
+		},
+		"httpVersion": {
+			"type": "string"
+		},
+		"headers": {
+			"type": "object"
+		},
+		"network": {
+			"type": "object",
+			"properties": {
+				"remoteAddress" : { "type": "string" },
+				"remoteFamily"  : { "enum": [ "IPv4", "IPv6" ] },
+				"remotePort"    : { "type": "number" },
+				"localAddress"  : { "type": "string" },
+				"localPort"     : { "type": "number" }
+			},
+			"required": [
+				"remoteAddress" ,
+				"remoteFamily"  ,
+				"remotePort"    ,
+				"localAddress"  ,
+				"localPort"     
+			]
+		},
+		"body": {
+			"type": "string"
+		},
+		"bodyDecompressed": {
+			"type": "boolean"
+		},
+		"bodyBuffer": {
+			"type": "object"
+		},
+		"performance": {
+			"type": "object"
+		}
+	},
+	"required": ["statusCode", "headers"],
+	"additionalProperties": false
+}
