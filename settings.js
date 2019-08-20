@@ -13,6 +13,16 @@ module.exports = {
 	// Whether to reject unsecure response.
 	"rejectUnauthorized": true,
 
+	// Whether HTTP/HTTPS agent will keep alive for more requests.
+	"keepAlive": true,
+
+	// HTTP/HTTPS proxy.
+	"proxy": null,
+
+	// ---------------------------
+	// Time-related settings.
+	// Unit: micro-seconds (except those delared explicitly)
+
 	// Time used to finish the whole request.
 	// ATTENTION: Time used to hostname resolving test is included.
 	// dns.lookup() -- "end" event
@@ -45,6 +55,4 @@ module.exports = {
 	// "connect" event -- "end" event (all data chunks arrive)
 	"data_timeout"     :  90000,
 
-	// Whether HTTP/HTTPS agent will keep alive for more requests.
-	"keepAlive"        :  true,
 };

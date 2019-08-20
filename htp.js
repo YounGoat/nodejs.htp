@@ -355,7 +355,8 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		}
 
 		// Get URL infos from urlname.
-		let urlParts = url.parse(urlname);
+		const urlParts = this.proxy ? this.proxy : url.parse(urlname);
+		const pathname = this.proxy ? urlname : urlParts.path;
 
 		timeout.start('REQUEST', fnDone);
 		timeout.start('DNS', fnDone);
@@ -371,6 +372,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				setHeaderIfUndefined(headers, 'Host', urlParts.hostname);
 			}
 			
+			
 			const options = {
 				protocol : urlParts.protocol,
 				auth     : urlParts.auth,
@@ -379,7 +381,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 				hostname : address,
 
 				port     : urlParts.port,
-				path     : urlParts.path,
+				path     : pathname,
 
 				method   : method,
 				headers  : headers,
@@ -489,33 +491,59 @@ function easyRequest_constructor(settings) {
 		return new easyRequest_constructor(settings);
 	}
 
-	let defined = name => settings && settings.hasOwnProperty(name);
-	let diff = name => settings && settings.hasOwnProperty(name) && settings[name] != defaultSettings[name];
+	settings = Object.assign({}, defaultSettings, settings);
 
-	if (defined('dnsAgent')) {
-		this.dnsAgent = settings.dnsAgent;
-	}
-	else if (diff('dns_ttl')) {
-		this.dnsAgent = new DnsAgent({ ttl: settings.dns_ttl });
-	}
+	const extract = name => {
+		let ret = settings[name];
+		delete settings[name];
+		return ret;
+	};
+
+	const steal = name => {
+		let ret = settings[name];
+		if (ret) {
+			this[name] = extract(name);
+		}
+		return ret;
+	};
 	
-	if (defined('httpAgent')) {
-		this.httpAgent = settings.httpAgent;
-	}
-	else if (diff('keepAlive')) {
-		this.httpAgent  = new http.Agent ({ keepAlive: settings.keepAlive });
+	AGENTS: {
+		// DIFF: the property is different with default setting value.
+		let DIFF = name => settings[name] != defaultSettings[name];
+
+		if (!steal('dnsAgent') && DIFF('dns_ttl')) {
+			this.dnsAgent = new DnsAgent({ ttl: extract('dns_ttl') });
+		}
+
+		if (DIFF('keepAlive')) {
+			let agentOptions = { keepAlive: extract('keepAlive') };
+
+			if (!steal('httpAgent')) {
+				this.httpAgent  = new http.Agent(agentOptions);
+			}
+
+			if (!steal('httpsAgent')) {
+				this.httpsAgent  = new https.Agent(agentOptions);
+			}
+		}
 	}
 
-	if (defined('httpsAgent')) {
-		this.httpsAgent = settings.httpsAgent;
-	}
-	else if (diff('keepAlive')) {
-		this.httpsAgent  = new https.Agent ({ keepAlive: settings.keepAlive });
+	PROXY: {
+		let proxy = extract('proxy');
+		if (typeof proxy == 'string') {
+			proxy = url.parse(proxy);
+		}
+
+		if (proxy && typeof proxy == 'object' && proxy.host && proxy.protocol) {
+			this.proxy = proxy;
+		}
+		else if (proxy) {
+			throw new Error('proxy should be a URL or an object and "protocol" and "hostname" is necessary');
+		}
 	}
 
-	this.settings = Object.assign({}, defaultSettings, settings);
+	this.settings = settings;
 	this.request = easyRequest;
-
 	http.METHODS.forEach((name) => {
 		this[name.toLowerCase()] = lambda(easyRequest, name);
 	});

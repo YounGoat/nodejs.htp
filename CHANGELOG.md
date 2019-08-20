@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.12.0] - Dec 18th, 2018
+
+*	Support proxy!
+
 ##	[0.11.0] - Nov 19th, 2018
 
 *	Fixed the bug trying gunzip a HEAD response.

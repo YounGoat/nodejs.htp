@@ -109,9 +109,6 @@ htp.get('http://www.example.com/')
 htp.piping
 	.get('http://download.example.com/data.json')
 	.pipe(fs.createWriteStream('data.json'))
-	.on('response', function(response) {
-		// ...
-	})
 	;
 
 // A property function named with "piping" prefixed (in camelCase) is equivalent.
@@ -121,7 +118,7 @@ htp
 	；
 ```
 
-返回的可读流对象支持以下事件：
+`htp.piping.<method>()` 方法返回的可读流对象支持以下事件：
 
 *	Event: '__dns__'
 	-	{ __address__ *string*, __family__ *number* }  
@@ -132,6 +129,8 @@ htp
 		该事件携带一个对象类型参数 response，该对象是最终响应对象的真子集。
 *	可读流对象默认支持的其他事件  
 	参见 [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable)。
+
+注意：返回值经过再一次 `.pipe()` 方法之后，新的返回值已经不是原来的流对象。
 
 
 ###	Advanced API
@@ -163,6 +162,9 @@ request.get('/index.html', function(err, response) {
 
 *	__options.pipingOnly__ *boolean*  
 	此开关仅在 piping 模式下有效。开启时，响应数据将不再被缓存和返回，*CALLBACK* 中传递的 __response__ 对象不再包含 `{ body, bodyBuffer, bodyDcompressed }` 属性。你只能透过管道获取响应数据。
+
+*	__options.proxy__ *string*  
+	代理。例如：`"http://localhost:8080/"`。
 
 *	__options.request_timeout__ *number* (unit: ms)  
 	请求从发起到接收响应完毕的最大允许时间。

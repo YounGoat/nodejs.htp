@@ -1,6 +1,8 @@
 #	htp
 __Maybe the easiest but still strong http client you have ever meet.__
 
+[![coverage status of github.com/YounGoat/nodejs.htp](https://coveralls.io/repos/github/YounGoat/nodejs.htp/badge.svg?branch=master)](https://coveralls.io/github/YounGoat/nodejs.htp2?branch=master)
+
 [![total downloads of htp](https://img.shields.io/npm/dt/htp.svg)](https://www.npmjs.com/package/htp)
 [![htp's License](https://img.shields.io/npm/l/htp.svg)](https://www.npmjs.com/package/htp)
 [![latest version of htp](https://img.shields.io/npm/v/htp.svg)](https://www.npmjs.com/package/htp)
@@ -12,6 +14,22 @@ __Maybe the easiest but still strong http client you have ever meet.__
 
 >	Languages / [简体中文](./README.zh_CN.md)  
 >	If links in this document not avaiable, please access [README on GitHub](./README.md) directly.
+
+##	Table of Contents
+
+* [Description](#description)
+* [ToC](#toc)
+* [Links](#links)
+* [Get Started](#get-started)
+* [API](#api)
+	* [The Response Object](#the-response-object)
+	* [Basic API](#basic-api)
+	* [Piping API](#piping-api)
+	* [Advanced API](#advanced-api)
+	* [Class SimpleAgent](#class-simpleagent)
+	* [Timeline](#timeline)
+* [About](#about)
+* [Recommendations](#recommendations)
 
 ##	Description
 
@@ -28,10 +46,11 @@ Another choice for you to finish HTTP or HTTPS request.
 	-	[Advanced API](#advanced-api)
 	-	[Class SimpleAgent](#class-simpleagent)
 	-	[Timeline](#timeline)
-*	[Why htp](#why-htp)
-*	[Honorable Dependents](#honorable-dependents)
 *	[About](#about)
-*	[References](#references)
+*	[Recommendations](#recommendations)
+
+##	Links
+
 *	[CHANGE LOG](./CHANGELOG.md)
 *	[Homepage](https://github.com/YounGoat/nodejs.htp)
 
@@ -131,9 +150,6 @@ Since v0.1.0, a streamable subset __htp.piping__ is available. Whether or not *C
 htp.piping
 	.get('http://download.example.com/data.json')
 	.pipe(fs.createWriteStream('data.json'))
-	.on('response', function(response) {
-		// ...
-	})
 	;
 
 // A property function named with "piping" prefixed (in camelCase) is equivalent.
@@ -143,7 +159,7 @@ htp
 	；
 ```
 
-The return stream may emit following events:
+The stream returned by `htp.piping.<method>()` may emit following events:
 
 *	Event: '__dns__'
 	-	{ __address__ *string*, __family__ *number* }
@@ -153,6 +169,8 @@ The return stream may emit following events:
 		Along with argument *response* which is a subset of the final response object.
 *	events which a readable stream may emit  
 	See [Class: stream.Readable](https://nodejs.org/dist/latest/docs/api/stream.html#stream_class_stream_readable) for details.
+
+ATTENTION: Which returned by `htp.piping.<method>()` and then returned by `.pipe()` are not the same stream.
 
 ###	Advanced API
 
@@ -183,6 +201,10 @@ Here are options available when creating a customized user agent:
 
 *	__options.pipingOnly__ *boolean*  
 	Only effective in piping mode. If set true, reponse data will no longer be staged and returned, and argument *response* passed to *CALLBACK* will no longer have properties `{ body, bodyBuffer, bodyDcompressed }`. You can only obtain response data through pipe.
+
+*	__options.proxy__ *string*  
+	Proxy, e.g. `"http://localhost:8080/"`.
+
 *	__options.request_timeout__ *number* (unit: ms)  
 	Max time to finish the whole request.  
 
@@ -253,12 +275,6 @@ Acceptable options accepted by __htp/SimpleAgent__ are:
 Here is the timeline of an __htp__ request:  
 ![HTP request process](./docs/htp.png)
 
-##  Why __htp__
-
-##  Honorable Dependents
-
-*	[osapi](https://www.npmjs.com/package/osapi)
-
 ##  About
 
 For convenience, this package has following names (alias):
@@ -268,4 +284,8 @@ For convenience, this package has following names (alias):
 *   [usa](https://www.npmjs.com/package/usa)  
 	It is not the United States of America. *usa* is abbreviation of *USerAgent*.
 
-##  References
+##	Recommendations
+
+*	[osapi](https://www.npmjs.com/package/osapi) or [ceph](https://www.npmjs.com/package/ceph)
+*	[urx](https://www.npmjs.com/package/urx)
+*	[proksy](https://www.npmjs.com/package/proksy)
