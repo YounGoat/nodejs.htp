@@ -249,7 +249,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		httpAgent  = if2(this.httpAgent , httpAgent );
 		httpsAgent = if2(this.httpsAgent, httpsAgent);
 	}
-	
+
 	let bodyStream = null;
 	if (settings.piping) {
 		bodyStream = new Receiver();
@@ -515,14 +515,17 @@ function easyRequest_constructor(settings) {
 			this.dnsAgent = new DnsAgent({ ttl: extract('dns_ttl') });
 		}
 
+		steal('httpAgent');
+		steal('httpsAgent');
+
 		if (DIFF('keepAlive')) {
 			let agentOptions = { keepAlive: extract('keepAlive') };
 
-			if (!steal('httpAgent')) {
+			if (!this.httpAgent) {
 				this.httpAgent  = new http.Agent(agentOptions);
 			}
 
-			if (!steal('httpsAgent')) {
+			if (!this.httpsAgent) {
 				this.httpsAgent  = new https.Agent(agentOptions);
 			}
 		}
