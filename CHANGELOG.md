@@ -2,6 +2,11 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.12.1] - 2021-04-27
+
+*	取消默认字符集为 utf8 的设置。
+*	当内容类型（content-type）未指定字符集时，根据类型数据库提供的默认字符集（如有），尝试将其转换为字符串。
+
 ##	[0.12.0] - Dec 18th, 2018
 
 *	Support proxy!

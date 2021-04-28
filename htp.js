@@ -14,6 +14,7 @@ const MODULE_REQUIRE = 1
 	/* NPM */
 	, overload2 = require('overload2')
 	, if2 = require('if2')
+	, mimeDb = require('mime-db')
 	, DnsAgent = require('dns-agent')
 	, Type = overload2.Type
 
@@ -102,7 +103,7 @@ const processResponse = function(method, settings, bodyStream, timeout, response
 	let content =
 		{ length: null
 		, type: null
-		, charset: 'utf8'
+		, charset: null
 		, boundary: null
 		, encoding: null
 		};
@@ -211,14 +212,26 @@ const processResponse = function(method, settings, bodyStream, timeout, response
 
 const parseBody = function(buf, content) {
 	let body = null;
-
+	
 	// If charset unsupported, return null without parsing.	
-	let charset = charsets(content.charset);
+	let charset = content.charset && charsets(content.charset);
 	if (charset) {
 		body = buf.toString(charset);		
+	}	
+	else if (content.type) {
+		let typeinfo = mimeDb[content.type];
+		if (typeinfo && typeinfo.charset) {
+			body = buf.toString(typeinfo.charset);
+		}
+		else if (content.type == 'text/plain') {
+			body = buf.toString();
+		}
 	}
+	/**
+	 * @compatible 
+	 */
 	else {
-		// DO NOTHING.
+		body = buf.toString();
 	}
 
 	if (body && content.type === 'application/json') {

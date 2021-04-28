@@ -45,10 +45,12 @@ let commonValidate = (err, response, statusCode, body, lengthOfBodyBuffer) => {
 	assert.equal(body, response.body);
 
 	// Validate the length of bodyBuffer.
-	if (typeof lengthOfBodyBuffer === 'undefined') {
+	if (lengthOfBodyBuffer != undefined && typeof body == 'string') {
 		lengthOfBodyBuffer = body.length;
 	}
-	assert.equal(lengthOfBodyBuffer, response.bodyBuffer.length);
+	if (lengthOfBodyBuffer != undefined) {
+		assert.equal(lengthOfBodyBuffer, response.bodyBuffer.length);
+	}
 };
 
 before((done) => {

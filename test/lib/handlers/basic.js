@@ -41,7 +41,7 @@ module.exports = function(req, res) {
 			}
 		}
 
-		let buf = new Buffer(content, 'utf8');
+		let buf = Buffer.from(content, 'utf8');
 
 		if (req.url == '/gzip') {
 			res.setHeader('Content-Encoding', 'gzip');
@@ -54,6 +54,7 @@ module.exports = function(req, res) {
 
 		res.setHeader('X-Url', req.url);
 		res.setHeader('Content-Length', buf.length);
+		res.setHeader('Content-Type', 'text/plain');
 		res.end(buf);
 	};
 
