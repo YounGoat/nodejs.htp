@@ -18,6 +18,7 @@ function Server(name) {
     this.port = null;
 
     this.server = null;
+    this.sockets = new Set();
 }
 
 // Start an HTTP server to be connected to.
@@ -28,6 +29,7 @@ Server.prototype.start = function(done) {
     // Http server to be accessed.
     // 供测试访问的 HTTP 服务。
     this.server = http.createServer(httpHandler);
+    this.server.on('connection', socket => this.sockets.add(socket));
 
     // Get available server port and then start http server.
 	getAvailablePort((port) => {
@@ -37,7 +39,10 @@ Server.prototype.start = function(done) {
 	});
 };
 
-Server.prototype.stop = function(done) {
+Server.prototype.stop = function(done) {    
+    for (const socket of this.sockets) {
+        socket.destroy();
+    }
     this.server.close();
     done();
 };

@@ -2,6 +2,9 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##	[0.13.0] - 2021-05-13
+
+*	不再自动按 HTTP method 名称创建 `htp.piping<Method>` 和 `htp.pipingOnly<Method>` 方法，但仍支持按 `htp.piping.<method>` 和 `htp.pipingOnly.<method>` 方式引用。
 ##	[0.12.1] - 2021-04-27
 
 *	取消默认字符集为 utf8 的设置。

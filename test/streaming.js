@@ -31,7 +31,7 @@ after((done) => {
 describe('piping mode', function() {
 	it('GET', (done) => {
 		let bodyBuffer = null;
-		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
+		let output = htp.piping.get(httpServer.genUrl('/streaming'), (err, res) => {
 				assert.equal(null, err);
 				assert(bodyBuffer.equals(res.bodyBuffer));
 				done();
@@ -47,7 +47,7 @@ describe('piping mode', function() {
 
 	it('events', (done) => {
 		let events = [];
-		let output = htp.pipingGet(httpServer.genUrl('/streaming'), (err, res) => {
+		let output = htp.piping.get(httpServer.genUrl('/streaming'), (err, res) => {
 				assert.equal(3, events.length);
 				done();
 			})
@@ -67,7 +67,7 @@ describe('piping mode', function() {
 	});
 
 	it('pipingOnly', (done) => {
-		let output = htp.pipingOnlyGet(httpServer.genUrl('/streaming'), (err, res) => {
+		let output = htp.pipingOnly.get(httpServer.genUrl('/streaming'), (err, res) => {
 			assert.equal(undefined, res.body);
 			done();
 		})

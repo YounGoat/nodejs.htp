@@ -26,6 +26,7 @@ const MODULE_REQUIRE = 1
 	, Receiver = require('./lib/Receiver')
 
 	, ERRORS = require('./ERRORS')
+	, FORM = require('./FORM')
 	, defaultSettings = require('./settings')
 	, METHODS_WITHOUT_PAYLOAD = require('./methods-without-payload')
 	, charsets = require('./charsets')
@@ -40,6 +41,10 @@ const MODULE_REQUIRE = 1
 		}
 		if (!found) headers[name] = value;
 		return found;
+	}
+
+	, isPlainObject = body => {
+		return body != null && typeof body == 'object' && body.constructor === Object;
 	}
 	;
 
@@ -282,7 +287,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 	// Each header field consists of a name followed by a colon (":") and the field value. Field names are case-insensitive.
 	// @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
-	if (1) {
+	NORMALIZE_HEADER: {
 		let normalizedHeaders = {};
 		for (let name in headers) {
 			normalizedHeaders[name.toLowerCase()] = headers[name];
@@ -294,7 +299,35 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 		headers['accept-encoding'] = 'gzip, deflate';
 	}
 
-	if (body instanceof Array || (body != null && typeof body == 'object' && body.constructor === Object)) {
+	if (headers['content-type'] == FORM.URLENCODED && isPlainObject(body)) {
+		let encoded = [];
+		for (let name in body) {
+			encoded.push(`${name}=${encodeURIComponent(body[name])}`);
+		}
+		body = encoded.join('&');
+	}
+	else if (headers['content-type'] == FORM.MULTIPART && isPlainObject(body)) {
+		let boundary = 'ching-69fc0030e9c9f1762abf8db903fed272';
+		let lines = [];
+		for (let name in body) {
+			let values = body[name];
+			if (!Array.isArray(values)) {
+				values = [ values ];
+			}
+			values.forEach(value => {
+				lines.push(`--${boundary}`);
+				lines.push(`Content-Disposition: form-data; name="${name}"`);
+				lines.push('');
+				lines.push(value);
+			});			
+		}
+		lines.push(`--${boundary}--`);
+		lines.push('');
+
+		headers['content-type'] = `multipart/form-data; boundary=${boundary}`;
+		body = lines.join('\r\n');
+	}
+	else if (body instanceof Array || isPlainObject(body)) {
 		body = JSON.stringify(body);
 		if (util.isUndefined(headers['content-type'])) {
 			headers['content-type'] = 'application/json';
@@ -338,7 +371,7 @@ const baseRequest = function(method, urlname, headers, body, callback) {
 
 		// Validate the urlname.
 		// Complete the urlname with defualt settings if necessary.
-		if (1) {
+		PROCESS_URL: {
 			/^((http:|https:)?(\/\/))?/.test(urlname);
 
 			// If both protocol and host are not specified,
@@ -627,12 +660,14 @@ http.METHODS.forEach((NAME) => {
 
 	easyRequest[name] = lambda(easyRequest, NAME);
 	
-	easyRequest[`piping${Name}`] = lambda(easyRequest, NAME).bind(pipingRequest);
+	// easyRequest[`piping${Name}`] = lambda(easyRequest, NAME).bind(pipingRequest);
 	easyRequest.piping[name] = lambda(easyRequest, NAME).bind(pipingRequest);
 	
-	easyRequest[`pipingOnly${Name}`] = lambda(easyRequest, NAME).bind(pipingOnlyRequest);
+	// easyRequest[`pipingOnly${Name}`] = lambda(easyRequest, NAME).bind(pipingOnlyRequest);
 	easyRequest.pipingOnly[name] = lambda(easyRequest, NAME).bind(pipingOnlyRequest);
 });
 
 easyRequest.request = easyRequest;
+easyRequest.FORM = FORM;
+
 module.exports = easyRequest;

@@ -17,7 +17,7 @@ describe('customized htp user-agent', () => {
 		});
 
 		agent.request('GET', '/', (err, response) => {
-			done(err || response.statusCode != 200);
+			done(err || response.statusCode >= 400);
 		});
 	});
 
@@ -27,7 +27,7 @@ describe('customized htp user-agent', () => {
 		});
 
 		agent.get('/', (err, response) => {
-			done(err || response.statusCode != 200);
+			done(err || response.statusCode >= 400);
 		})
 	});
 });
